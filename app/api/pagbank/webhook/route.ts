@@ -1,6 +1,15 @@
 import { NextResponse } from "next/server"
+import { isValidApiKey } from "@/lib/api-config"
 
 export async function POST(request: Request) {
+  // Verificar a chave de API se fornecida
+  const apiKey = request.headers.get("authorization")?.replace("Bearer ", "") || ""
+
+  // Se a chave de API for fornecida mas for inválida, retornar erro
+  if (apiKey && !isValidApiKey(apiKey)) {
+    return NextResponse.json({ error: "Chave de API inválida" }, { status: 401 })
+  }
+
   try {
     const body = await request.json()
 

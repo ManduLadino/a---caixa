@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { useAppContext } from "@/contexts/app-context"
-import { Moon, Sun, Menu, X, Home, History, Crown, User } from "lucide-react"
+import { Moon, Sun, Menu, X, Home, History, Crown, User, BarChart } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -51,6 +51,21 @@ export default function Navbar() {
                 </Link>
               )
             })}
+            <Link
+              href="/api-docs"
+              className="px-3 py-2 rounded-md text-sm font-medium text-[#e6d8ff] hover:bg-white/10"
+            >
+              API Docs
+            </Link>
+            <Link
+              href="/admin/dashboard"
+              className="px-3 py-2 rounded-md text-sm font-medium text-[#e6d8ff] hover:bg-white/10"
+            >
+              <span className="flex items-center">
+                <BarChart className="h-4 w-4 mr-2" />
+                Dashboard
+              </span>
+            </Link>
 
             <Button variant="ghost" size="icon" onClick={toggleTheme} className="ml-2 text-[#e6d8ff] hover:bg-white/10">
               {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
@@ -104,6 +119,23 @@ export default function Navbar() {
                   </Link>
                 )
               })}
+              <Link
+                href="/api-docs"
+                className="block px-3 py-2 rounded-md text-base font-medium text-[#e6d8ff] hover:bg-white/10"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                API Docs
+              </Link>
+              <Link
+                href="/admin/dashboard"
+                className="block px-3 py-2 rounded-md text-base font-medium text-[#e6d8ff] hover:bg-white/10"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <span className="flex items-center">
+                  <BarChart className="h-4 w-4 mr-2" />
+                  Dashboard
+                </span>
+              </Link>
             </div>
           </motion.div>
         )}

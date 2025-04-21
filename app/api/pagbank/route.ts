@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server"
+import { API_KEYS, getAuthHeader } from "@/lib/api-config"
 
 // Configurações do PagBank
 const PAGBANK_API_URL =
   process.env.NODE_ENV === "production" ? "https://api.pagseguro.com" : "https://sandbox.api.pagseguro.com"
 
-const PAGBANK_TOKEN = process.env.PAGBANK_TOKEN || "SEU_TOKEN_AQUI"
+const PAGBANK_TOKEN = API_KEYS.PAGBANK_TOKEN
 
 // Função para criar um pedido no PagBank
 async function createOrder(data: any) {
@@ -15,6 +16,7 @@ async function createOrder(data: any) {
         Authorization: `Bearer ${PAGBANK_TOKEN}`,
         "Content-Type": "application/json",
         "x-api-version": "4.0",
+        ...getAuthHeader(), // Adiciona os cabeçalhos de autenticação
       },
       body: JSON.stringify(data),
     })
@@ -32,7 +34,16 @@ async function createOrder(data: any) {
   }
 }
 
+// Resto do código permanece o mesmo...
 export async function POST(request: Request) {
+  // Verificar a chave de API
+  const apiKey = request.headers.get("authorization")?.replace("Bearer ", "") || ""
+
+  // Se a chave de API for fornecida mas for inválida, retornar erro
+  if (apiKey && !apiKey.includes(API_KEYS.MAIN_API_KEY)) {
+    return NextResponse.json({ error: "Chave de API inválida" }, { status: 401 })
+  }
+
   try {
     const body = await request.json()
     const { planId, customerData, amount } = body
@@ -78,7 +89,7 @@ export async function POST(request: Request) {
           },
         },
       ],
-      notification_urls: [`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/pagbank/webhook`],
+      notification_urls: [`${API_KEYS.BASE_URL}/api/pagbank/webhook`],
       charges: [
         {
           reference_id: `charge-${Date.now()}`,
