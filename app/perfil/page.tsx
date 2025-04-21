@@ -7,6 +7,7 @@ import { motion } from "framer-motion"
 import { User, Settings, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useAppContext } from "@/contexts/app-context"
+import SubscriptionDetails from "@/components/subscription-details"
 
 export default function PerfilPage() {
   const { subscriptionTier, readings } = useAppContext()
@@ -67,6 +68,15 @@ export default function PerfilPage() {
             </Button>
           </div>
         </HolographicCard>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="w-full max-w-3xl mb-6"
+      >
+        <SubscriptionDetails />
       </motion.div>
     </main>
   )

@@ -131,6 +131,9 @@ export default function VirtualStoneBox() {
   const [speechRecognitionAvailable, setSpeechRecognitionAvailable] = useState(false)
   const [recognition, setRecognition] = useState<any>(null)
   const [speechRecognitionUsed, setSpeechRecognitionUsed] = useState(false)
+  const [isCapturingImage, setIsCapturingImage] = useState(false)
+  const [isSpeechRecognitionActive, setIsSpeechRecognitionActive] = useState(false)
+  const [speechRecognitionError, setSpeechRecognitionError] = useState<string | null>(null)
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -430,10 +433,25 @@ export default function VirtualStoneBox() {
         setTranscribedText(transcript)
         setAudioQuestion(transcript)
         setQuestion(transcript)
+        setIsSpeechRecognitionActive(false)
+        setSpeechRecognitionError(null)
       }
 
-      recognitionInstance.onerror = () => {
+      recognitionInstance.onstart = () => {
+        setIsSpeechRecognitionActive(true)
+        setSpeechRecognitionError(null)
+      }
+
+      recognitionInstance.onend = () => {
+        setIsSpeechRecognitionActive(false)
+        setSpeechRecognitionError(null)
+      }
+
+      recognitionInstance.onerror = (event: any) => {
+        console.error("Erro no reconhecimento de voz:", event.error)
         setTranscribedText("Não foi possível reconhecer o áudio. Por favor, digite sua pergunta.")
+        setIsSpeechRecognitionActive(false)
+        setSpeechRecognitionError("Não foi possível reconhecer o áudio.")
       }
 
       setRecognition(recognitionInstance)
@@ -468,6 +486,7 @@ export default function VirtualStoneBox() {
               recognitionInstance.start()
             } else {
               setTranscribedText("Reconhecimento de voz não suportado. Por favor, digite sua pergunta.")
+              setSpeechRecognitionError("Reconhecimento de voz não suportado.")
             }
           }
 
@@ -487,6 +506,7 @@ export default function VirtualStoneBox() {
               setTranscribedText(data.text)
               setAudioQuestion(data.text)
               setQuestion(data.text)
+              setSpeechRecognitionError(null)
             } else {
               // Se não houver texto, tenta usar o reconhecimento de voz do navegador
               useSpeechRecognition()
@@ -499,6 +519,7 @@ export default function VirtualStoneBox() {
         } catch (error) {
           console.error("Erro ao processar áudio:", error)
           setTranscribedText("Erro ao processar áudio. Por favor, digite sua pergunta.")
+          setSpeechRecognitionError("Erro ao processar áudio.")
         } finally {
           // Limpa as faixas do stream
           if (newStream) {
@@ -511,10 +532,12 @@ export default function VirtualStoneBox() {
       // Inicia a gravação
       mediaRecorder.start()
       setIsRecordingAudio(true)
+      setSpeechRecognitionError(null)
     } catch (error) {
       console.error("Erro ao iniciar gravação de áudio:", error)
       alert("Não foi possível acessar o microfone. Verifique as permissões do navegador.")
       setIsRecordingAudio(false)
+      setSpeechRecognitionError("Não foi possível acessar o microfone.")
     }
   }, [speechRecognitionAvailable, recognition])
 
@@ -808,67 +831,49 @@ export default function VirtualStoneBox() {
     if (!boxRef.current) return
 
     try {
-      // Captura o elemento da caixa para gravação
-      const stream = await navigator.mediaDevices.getDisplayMedia({
-        video: {
-          displaySurface: "browser",
-          cursor: "always",
-        },
-        audio: true,
-      })
+      setIsCapturingImage(true)
+      // Em vez de tentar capturar a tela, vamos capturar apenas o conteúdo do canvas
+      const canvas = document.createElement("canvas")
+      const box = boxRef.current
+      const { width, height } = box.getBoundingClientRect()
 
-      // Cria o MediaRecorder
-      const mediaRecorder = new MediaRecorder(stream, { mimeType: "video/webm" })
-      mediaRecorderRef.current = mediaRecorder
-      chunksRef.current = []
+      canvas.width = width
+      canvas.height = height
 
-      // Configura os eventos do MediaRecorder
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          chunksRef.current.push(event.data)
-        }
+      // Use html2canvas ou uma abordagem similar para capturar o conteúdo
+      // Por enquanto, vamos apenas criar uma imagem simples
+      const ctx = canvas.getContext("2d")
+      if (ctx) {
+        // Desenha um fundo
+        ctx.fillStyle = "#f5f5f0"
+        ctx.fillRect(0, 0, width, height)
+
+        // Desenha as pedras
+        stones.forEach((stone) => {
+          ctx.beginPath()
+          ctx.arc(stone.x, stone.y, stone.size / 2, 0, Math.PI * 2)
+          ctx.fillStyle = stone.color
+          ctx.fill()
+        })
+
+        // Converte o canvas para uma URL de dados
+        const dataUrl = canvas.toDataURL("image/png")
+        setVideoUrl(dataUrl)
       }
 
-      mediaRecorder.onstop = () => {
-        // Cria um blob com os chunks gravados
-        const blob = new Blob(chunksRef.current, { type: "video/webm" })
-        const url = URL.createObjectURL(blob)
-        setVideoUrl(url)
-
-        // Limpa as faixas do stream
-        stream.getTracks().forEach((track) => track.stop())
-
-        setIsRecording(false)
-
-        // Reproduz o vídeo gravado
-        if (videoRef.current) {
-          videoRef.current.src = url
-        }
-      }
-
-      // Inicia a gravação
-      mediaRecorder.start()
-      setIsRecording(true)
-
-      // Instrui o usuário
-      alert(
-        "Gravação iniciada! Capture a tela que contém a caixa de pedras. Clique em 'Parar Gravação' quando terminar.",
-      )
-    } catch (error) {
-      console.error("Erro ao iniciar gravação:", error)
-      alert("Não foi possível iniciar a gravação. Verifique as permissões do navegador.")
       setIsRecording(false)
+      setIsCapturingImage(false)
+
+      alert('Captura concluída! Você pode baixar a imagem usando o botão "Baixar Imagem".')
+    } catch (error) {
+      console.error("Erro ao capturar imagem:", error)
+      alert("Não foi possível capturar a imagem. Tente novamente mais tarde.")
+      setIsRecording(false)
+      setIsCapturingImage(false)
     }
   }
 
-  // Para a gravação de vídeo
-  const stopRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop()
-    }
-  }
-
-  // Exporta o resultado como MP4
+  // Substitua a função exportAsMP4 por esta versão
   const exportAsMP4 = () => {
     if (!scanComplete) {
       alert("Primeiro escaneie as pedras.")
@@ -876,16 +881,16 @@ export default function VirtualStoneBox() {
     }
 
     if (videoUrl) {
-      // Se já temos um vídeo gravado, oferece para download
+      // Se já temos uma imagem capturada, oferece para download
       const a = document.createElement("a")
       a.href = videoUrl
-      a.download = `leitura-mistica-${Date.now()}.webm`
+      a.download = `leitura-mistica-${Date.now()}.png`
       document.body.appendChild(a)
       a.click()
       document.body.removeChild(a)
     } else {
-      // Oferece para iniciar gravação
-      if (confirm("Deseja gravar um vídeo da sua experiência com a caixa de pedras?")) {
+      // Oferece para iniciar captura
+      if (confirm("Deseja capturar uma imagem da sua caixa de pedras?")) {
         startRecording()
       }
     }
@@ -1030,6 +1035,11 @@ export default function VirtualStoneBox() {
           <div className="mt-2 p-2 bg-white/5 rounded-md text-sm">
             <p className="text-gray-300">Pergunta transcrita:</p>
             <p className="text-white">{transcribedText}</p>
+          </div>
+        )}
+        {speechRecognitionError && (
+          <div className="mt-2 p-2 bg-red-100 border border-red-500 rounded-md text-sm">
+            <p className="text-red-700">{speechRecognitionError}</p>
           </div>
         )}
       </div>
@@ -1210,12 +1220,19 @@ export default function VirtualStoneBox() {
                           Gerar Áudio
                         </Button>
                       )}
-                      <Button onClick={exportAsMP4} className="bg-[#6a1fc7] hover:bg-[#8e2de2] text-white">
-                        <Download className="w-4 h-4 mr-2" /> {videoUrl ? "Baixar Vídeo" : "Gravar Vídeo"}
+                      <Button
+                        onClick={exportAsMP4}
+                        className="bg-[#6a1fc7] hover:bg-[#8e2de2] text-white"
+                        disabled={isCapturingImage}
+                      >
+                        <Download className="w-4 h-4 mr-2" /> {videoUrl ? "Baixar Imagem" : "Capturar Imagem"}
                       </Button>
                       {isRecording && (
-                        <Button onClick={stopRecording} className="bg-red-600 hover:bg-red-700 text-white">
-                          Parar Gravação
+                        <Button
+                          onClick={() => setIsRecording(false)}
+                          className="bg-red-600 hover:bg-red-700 text-white"
+                        >
+                          Cancelar Captura
                         </Button>
                       )}
                       <Button
