@@ -5,6 +5,7 @@ import MobileNavbar from "@/components/mobile-navbar"
 import SubscriptionPlans from "@/components/subscription-plans"
 import { motion } from "framer-motion"
 import { Crown } from "lucide-react"
+import MobileFooter from "@/components/mobile-footer"
 
 export default function AssinaturaPage() {
   return (
@@ -30,6 +31,9 @@ export default function AssinaturaPage() {
       </motion.div>
 
       <SubscriptionPlans />
+      <div className="pb-20">
+        <MobileFooter />
+      </div>
     </main>
   )
 }

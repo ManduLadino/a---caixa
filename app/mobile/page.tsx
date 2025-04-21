@@ -14,6 +14,7 @@ import { useAppContext } from "@/contexts/app-context"
 import { useRouter } from "next/navigation"
 import VirtualStoneBox from "@/components/virtual-stone-box"
 import { Sparkles, Star, Wand2, Loader2, Camera, ArrowRight, Box, X } from "lucide-react"
+import MobileFooter from "@/components/mobile-footer"
 
 export default function MobilePage() {
   const { addReading } = useAppContext()
@@ -577,6 +578,9 @@ export default function MobilePage() {
             Próximo <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         )}
+      </div>
+      <div className="pb-20">
+        <MobileFooter />
       </div>
     </main>
   )

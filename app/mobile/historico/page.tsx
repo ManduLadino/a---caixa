@@ -5,6 +5,7 @@ import MobileNavbar from "@/components/mobile-navbar"
 import ReadingHistory from "@/components/reading-history"
 import { motion } from "framer-motion"
 import { ScrollText } from "lucide-react"
+import MobileFooter from "@/components/mobile-footer"
 
 export default function HistoricoPage() {
   return (
@@ -30,6 +31,9 @@ export default function HistoricoPage() {
       </motion.div>
 
       <ReadingHistory />
+      <div className="pb-20">
+        <MobileFooter />
+      </div>
     </main>
   )
 }

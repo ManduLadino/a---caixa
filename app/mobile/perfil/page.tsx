@@ -7,6 +7,7 @@ import { User, Settings, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useAppContext } from "@/contexts/app-context"
 import SubscriptionDetails from "@/components/subscription-details"
+import MobileFooter from "@/components/mobile-footer"
 
 export default function PerfilPage() {
   const { subscriptionTier, readings } = useAppContext()
@@ -77,6 +78,9 @@ export default function PerfilPage() {
       >
         <SubscriptionDetails />
       </motion.div>
+      <div className="pb-20">
+        <MobileFooter />
+      </div>
     </main>
   )
 }
