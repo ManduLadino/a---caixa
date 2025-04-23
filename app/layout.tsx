@@ -1,18 +1,13 @@
 import type React from "react"
-import "./globals.css"
-import type { Metadata } from "next"
+import "@/app/globals.css"
 import { Inter } from "next/font/google"
-import { ThemeProvider } from "@/components/theme-provider"
-import { AppProvider } from "@/contexts/app-context"
-import MobileRedirect from "@/components/mobile-redirect"
-import Footer from "@/components/footer"
+import { Toaster } from "@/components/ui/toaster"
 
 const inter = Inter({ subsets: ["latin"] })
 
-export const metadata: Metadata = {
-  title: "A CAIXA – Oráculo Digital com IA",
-  description: "Um oráculo digital que une misticismo ancestral à inteligência artificial",
-  manifest: "/manifest.json",
+export const metadata = {
+  title: "Projeto MANDU CANNABINIO - Formulário de Cadastro",
+  description: "Formulário para cadastro e renovação de pacientes (TFD/CERAC)",
     generator: 'v0.dev'
 }
 
@@ -23,20 +18,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
-      <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
-      </head>
       <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
-          <AppProvider>
-            <MobileRedirect />
-            <div className="flex flex-col min-h-screen">
-              <main className="flex-grow">{children}</main>
-              <Footer />
-            </div>
-          </AppProvider>
-        </ThemeProvider>
+        {children}
+        <Toaster />
       </body>
     </html>
   )

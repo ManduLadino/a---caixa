@@ -1,6 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -8,18 +7,8 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    domains: ['placeholder.com'],
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**',
-      },
-    ],
     unoptimized: true,
   },
-  experimental: {
-    serverActions: true,
-  },
-};
+}
 
-export default nextConfig;
+export default nextConfig
