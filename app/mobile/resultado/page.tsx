@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { ParticleBackground } from "@/components/ui/particle-background"
 import MobileNavbar from "@/components/mobile-navbar"
 import { useAppContext } from "@/contexts/app-context"
-import MandalaGenerator from "@/components/mandala-generator"
+import { MandalaGenerator } from "@/components/mandala-generator"
 import { motion } from "framer-motion"
 import { Play, Pause, Download, Share2, ArrowLeft, Star } from "lucide-react"
 
@@ -119,7 +119,13 @@ export default function ResultadoPage() {
       <div className="w-full max-w-md flex justify-center mb-6">
         <div className="relative w-64 h-64">
           <div className="absolute inset-0 rounded-full animate-spin-slow" style={{ animationDuration: "120s" }}>
-            <MandalaGenerator params={reading.mandalaParams} size={256} className="rounded-full" />
+            <MandalaGenerator
+              params={reading.mandalaParams}
+              size={256}
+              className="rounded-full"
+              animate={true}
+              highQuality={true}
+            />
           </div>
         </div>
       </div>
@@ -241,7 +247,13 @@ export default function ResultadoPage() {
           >
             <div className="flex flex-col items-center">
               <div className="w-32 h-32 mb-6">
-                <MandalaGenerator params={reading.mandalaParams} size={128} className="rounded-full" />
+                <MandalaGenerator
+                  params={reading.mandalaParams}
+                  size={128}
+                  className="rounded-full"
+                  animate={true}
+                  highQuality={true}
+                />
               </div>
 
               <h3 className="text-lg font-bold mb-2">Compartilhe sua leitura</h3>

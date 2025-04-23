@@ -5,18 +5,18 @@ import type React from "react"
 import { useState, useRef, useEffect, useCallback } from "react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { Sparkles, Wand2, Camera, Volume2, Download, Mic, MicOff } from "lucide-react"
+import { Sparkles, Wand2, Camera, Volume2, Download, Mic, MicOff, X } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { stonePrompts } from "@/lib/stone-prompts"
 import { MandalaGenerator } from "@/components/mandala-generator"
 
-// Define os 33 tipos de pedras com suas cores e propriedades
+// Definição das 33 pedras com dados mais detalhados
 const stoneTypes = Object.keys(stonePrompts).map((key) => {
   const stone = stonePrompts[key]
 
   // Adiciona variações de cores para cada tipo de pedra para mais realismo
   const baseColor = stone.color
-  const colorVariations = generateColorVariations(baseColor, 3)
+  const colorVariations = generateColorVariations(baseColor, 5)
 
   return {
     id: key,
@@ -26,6 +26,10 @@ const stoneTypes = Object.keys(stonePrompts).map((key) => {
     name: stone.name,
     energy: 85, // Energia padrão
     texture: Math.floor(Math.random() * 5) + 1, // Textura aleatória (1-5)
+    roughness: Math.random() * 0.5 + 0.3, // Rugosidade (0.3-0.8)
+    shine: Math.random() * 0.7, // Brilho (0-0.7)
+    opacity: Math.random() * 0.3 + 0.7, // Opacidade (0.7-1.0)
+    shape: Math.floor(Math.random() * 5) + 1, // Forma (1-5)
   }
 })
 
@@ -68,26 +72,29 @@ interface Stone {
   energy: number
   glowColor: string
   texture: number
-  shape: number // Forma irregular (1-5)
-  roughness: number // Rugosidade (0-1)
-  shine: number // Brilho (0-1)
-  opacity: number // Opacidade (0.7-1)
+  shape: number
+  roughness: number
+  shine: number
+  opacity: number
+  elevation: number // Altura da pedra na caixa (para efeito 3D)
+  shadow: number // Intensidade da sombra
+  glow: number // Intensidade do brilho
 }
 
 // Leitura mística padrão para fallback
 const defaultReading = `
 # Leitura Mística das Pedras
 
-## Passado
-As pedras revelam um caminho de aprendizado e crescimento. Você passou por desafios que fortaleceram sua essência espiritual. As energias das pedras mostram que você carrega sabedoria de experiências passadas.
+## Percepção Interior Atual
+As pedras revelam que você está em um momento de transição interior. Sua energia vibra em busca de equilíbrio, como cristais que ressoam em harmonia. Há uma força silenciosa crescendo dentro de você, aguardando o momento certo para manifestar-se. As pedras mostram que sua intuição está especialmente aguçada neste ciclo.
 
-## Presente
-Neste momento, você está em um período de transformação. As pedras indicam que há energias positivas ao seu redor, apoiando suas decisões. É um momento para confiar em sua intuição e seguir em frente com confiança.
+## Bloqueios Energéticos Ocultos
+Existe uma resistência sutil que impede o fluxo completo de sua energia criativa. As pedras indicam um padrão de pensamento recorrente que, como uma sombra, segue seus passos sem que você perceba. Este bloqueio está relacionado a experiências passadas que ainda não foram completamente integradas à sua consciência.
 
-## Futuro
-O futuro se mostra promissor, com novas oportunidades surgindo em seu caminho. As pedras sugerem que mantendo o equilíbrio entre mente, corpo e espírito, você encontrará harmonia e realização em sua jornada.
+## Caminhos para Expansão do ECI
+O caminho para expandir seu Estado de Consciência Interna se revela através da aceitação do silêncio. As pedras sugerem práticas de contemplação junto à natureza, especialmente ao amanhecer. Há um portal energético se abrindo que favorece sua conexão com dimensões mais sutis da existência. Confie no ritmo natural de seu despertar.
 
-Lembre-se que você é o criador do seu próprio destino, e as pedras apenas iluminam o caminho que você escolher seguir.
+Que as pedras místicas iluminem seu caminho interior e revelem os segredos que sua alma busca compreender. Qual aspecto desta leitura ressoa mais profundamente com seu momento atual?
 `
 
 // Parâmetros padrão para a mandala
@@ -99,13 +106,13 @@ const defaultMandalaParams = {
   symbols: ["estrela", "espiral", "lua"],
 }
 
-export default function VirtualStoneBox() {
+export default function EnhancedStoneBox() {
   const [stones, setStones] = useState<Stone[]>([])
   const [selectedStoneType, setSelectedStoneType] = useState(stoneTypes[0])
   const [isDragging, setIsDragging] = useState(false)
   const [currentStone, setCurrentStone] = useState<Stone | null>(null)
   const [showExample, setShowExample] = useState(false)
-  const [is3DMode, setIs3DMode] = useState(false)
+  const [is3DMode, setIs3DMode] = useState(true) // 3D ativado por padrão
   const [energyMode, setEnergyMode] = useState(false)
   const [isScanning, setIsScanning] = useState(false)
   const [scanComplete, setScanComplete] = useState(false)
@@ -135,9 +142,15 @@ export default function VirtualStoneBox() {
   const [isCapturingImage, setIsCapturingImage] = useState(false)
   const [isSpeechRecognitionActive, setIsSpeechRecognitionActive] = useState(false)
   const [speechRecognitionError, setSpeechRecognitionError] = useState<string | null>(null)
-
   const [speechRecognitionSetup, setSpeechRecognitionSetup] = useState(false)
   const [transcriptionInProgress, setTranscriptionInProgress] = useState(false)
+  const [boxStyle, setBoxStyle] = useState<"golden" | "wooden" | "dark">("golden") // Novo estado para estilo da caixa
+  const [showStoneInfo, setShowStoneInfo] = useState(false)
+  const [selectedStoneInfo, setSelectedStoneInfo] = useState<any>(null)
+  const [lightingEffect, setLightingEffect] = useState(true) // Efeito de iluminação ativado por padrão
+  const [ambientLight, setAmbientLight] = useState(0.5) // Intensidade da luz ambiente (0-1)
+  const [showAllStones, setShowAllStones] = useState(false) // Para mostrar todas as 33 pedras
+  const [isSpeechEnabled, setIsSpeechEnabled] = useState(false)
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -175,6 +188,9 @@ export default function VirtualStoneBox() {
     const shine = Math.random() * 0.7 // 0-0.7 brilho
     const opacity = Math.random() * 0.3 + 0.7 // 0.7-1.0 opacidade
     const texture = Math.floor(Math.random() * 5) + 1 // 1-5 texturas
+    const elevation = Math.random() * 5 // 0-5px de elevação
+    const shadow = Math.random() * 0.5 + 0.5 // 0.5-1.0 intensidade da sombra
+    const glow = Math.random() * 0.3 // 0-0.3 intensidade do brilho
 
     return {
       id: `stone-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -193,6 +209,9 @@ export default function VirtualStoneBox() {
       roughness,
       shine,
       opacity,
+      elevation,
+      shadow,
+      glow,
     }
   }
 
@@ -218,15 +237,28 @@ export default function VirtualStoneBox() {
     })
 
     if (clickedStone) {
-      // Select the stone for dragging
-      setCurrentStone(clickedStone)
-      setIsDragging(true)
-      setStones((prevStones) =>
-        prevStones.map((stone) => ({
-          ...stone,
-          selected: stone.id === clickedStone.id,
-        })),
-      )
+      // Select the stone for dragging or show info
+      if (e.shiftKey) {
+        // Show stone info when shift+click
+        setSelectedStoneInfo({
+          name: stonePrompts[clickedStone.type]?.name || "Pedra Desconhecida",
+          meaning: stonePrompts[clickedStone.type]?.meaning || "Significado desconhecido",
+          color: clickedStone.color,
+          energy: clickedStone.energy,
+          type: clickedStone.type,
+        })
+        setShowStoneInfo(true)
+      } else {
+        // Regular click for dragging
+        setCurrentStone(clickedStone)
+        setIsDragging(true)
+        setStones((prevStones) =>
+          prevStones.map((stone) => ({
+            ...stone,
+            selected: stone.id === clickedStone.id,
+          })),
+        )
+      }
     } else {
       // Add a new stone
       addStone(x, y)
@@ -284,7 +316,7 @@ export default function VirtualStoneBox() {
 
     // Gera exatamente 33 pedras em diferentes padrões
     for (let i = 0; i < 33; i++) {
-      const stoneType = stoneTypes[Math.floor(Math.random() * stoneTypes.length)]
+      const stoneType = stoneTypes[i % stoneTypes.length] // Usa todas as 33 pedras em sequência
       const size = stoneType.sizes[Math.floor(Math.random() * stoneType.sizes.length)]
       const energy = stoneType.energy + (Math.random() * 20 - 10) // Variação de energia
       const glowColors = ["#ff9be2", "#c774f0", "#8e2de2", "#6a1fc7", "#36005d"]
@@ -297,6 +329,9 @@ export default function VirtualStoneBox() {
       const shine = Math.random() * 0.7 // 0-0.7 brilho
       const opacity = Math.random() * 0.3 + 0.7 // 0.7-1.0 opacidade
       const texture = Math.floor(Math.random() * 5) + 1 // 1-5 texturas
+      const elevation = Math.random() * 5 // 0-5px de elevação
+      const shadow = Math.random() * 0.5 + 0.5 // 0.5-1.0 intensidade da sombra
+      const glow = Math.random() * 0.3 // 0-0.3 intensidade do brilho
 
       let x, y
 
@@ -314,13 +349,14 @@ export default function VirtualStoneBox() {
           x = width / 2 + Math.cos(spiralAngle) * spiralRadius
           y = height / 2 + Math.sin(spiralAngle) * spiralRadius
           break
-        case 2: // Padrão em linhas
-          const rows = 5
-          const cols = 7
-          const row = Math.floor(i / cols)
-          const col = i % cols
-          x = (col + 1) * (width / (cols + 1)) + (Math.random() * 20 - 10)
-          y = (row + 1) * (height / (rows + 1)) + (Math.random() * 20 - 10)
+        case 2: // Padrão em mandala
+          const rings = 3
+          const stonesPerRing = Math.ceil(33 / rings)
+          const ringIndex = Math.floor(i / stonesPerRing)
+          const angleInRing = ((i % stonesPerRing) / stonesPerRing) * Math.PI * 2
+          const ringRadius = (ringIndex + 1) * ((Math.min(width, height) * 0.3) / rings)
+          x = width / 2 + Math.cos(angleInRing) * ringRadius
+          y = height / 2 + Math.sin(angleInRing) * ringRadius
           break
         case 3: // Padrão em grupos
           const groupCount = 4
@@ -356,6 +392,9 @@ export default function VirtualStoneBox() {
         roughness,
         shine,
         opacity,
+        elevation,
+        shadow,
+        glow,
       })
     }
 
@@ -387,6 +426,7 @@ export default function VirtualStoneBox() {
             x: stone.x + (Math.random() * 10 - 5) * (1 - progress),
             y: stone.y + (Math.random() * 10 - 5) * (1 - progress),
             rotation: stone.rotation + (Math.random() * 20 - 10) * (1 - progress),
+            elevation: Math.max(0, stone.elevation + (Math.random() * 8 - 4) * (1 - progress)),
           })),
         )
 
@@ -419,6 +459,27 @@ export default function VirtualStoneBox() {
   // Toggle realistic mode
   const toggleRealisticMode = () => {
     setRealisticMode(!realisticMode)
+  }
+
+  // Toggle lighting effect
+  const toggleLightingEffect = () => {
+    setLightingEffect(!lightingEffect)
+  }
+
+  // Toggle box style
+  const cycleBoxStyle = () => {
+    if (boxStyle === "golden") setBoxStyle("wooden")
+    else if (boxStyle === "wooden") setBoxStyle("dark")
+    else setBoxStyle("golden")
+  }
+
+  // Toggle show all stones
+  const toggleShowAllStones = () => {
+    setShowAllStones(!showAllStones)
+    if (!showAllStones) {
+      // Preenche a caixa com todas as 33 pedras
+      randomizeStones()
+    }
   }
 
   // Iniciar gravação de áudio para a pergunta
@@ -827,7 +888,7 @@ export default function VirtualStoneBox() {
       const ctx = canvas.getContext("2d")
       if (ctx) {
         // Desenha um fundo
-        ctx.fillStyle = "#f5f5f0"
+        ctx.fillStyle = boxStyle === "golden" ? "#d4af37" : boxStyle === "wooden" ? "#8b4513" : "#000000"
         ctx.fillRect(0, 0, width, height)
 
         // Desenha as pedras
@@ -908,6 +969,28 @@ export default function VirtualStoneBox() {
       background: `radial-gradient(circle at 30% 30%, ${mainColor} 0%, ${mainColor} 60%, ${secondaryColor} 100%)`,
     }
 
+    // Adiciona efeito de elevação (3D)
+    const elevationStyle = is3DMode
+      ? {
+          transform: `rotate(${stone.rotation}deg) translateZ(${stone.elevation}px)`,
+          boxShadow: `0 ${stone.elevation}px ${stone.elevation * 2}px rgba(0,0,0,${stone.shadow})`,
+        }
+      : {
+          transform: `rotate(${stone.rotation}deg)`,
+          boxShadow: `0 2px 4px rgba(0,0,0,${stone.shadow})`,
+        }
+
+    // Adiciona efeito de iluminação
+    const lightingStyle = lightingEffect
+      ? {
+          boxShadow: `
+        inset 0 0 ${stone.size / 10}px rgba(255,255,255,${stone.shine}),
+        0 ${stone.size / 20}px ${stone.size / 10}px rgba(0,0,0,${stone.shadow}),
+        0 0 ${stone.size / 3}px rgba(255,255,255,${ambientLight * 0.2})
+      `,
+        }
+      : {}
+
     return (
       <>
         {/* Base da pedra */}
@@ -918,14 +1001,11 @@ export default function VirtualStoneBox() {
             top: `${stone.y - stone.size / 2}px`,
             width: `${stone.size}px`,
             height: `${stone.size}px`,
-            transform: `rotate(${stone.rotation}deg)`,
             clipPath: clipPath,
             ...gradientStyle,
+            ...elevationStyle,
+            ...lightingStyle,
             opacity: stone.opacity,
-            boxShadow: `
-              inset 0 0 ${stone.size / 10}px rgba(255,255,255,${stone.shine}),
-              0 ${stone.size / 20}px ${stone.size / 10}px rgba(0,0,0,0.3)
-            `,
             zIndex: stone.selected ? 10 : 1,
           }}
         >
@@ -969,14 +1049,60 @@ export default function VirtualStoneBox() {
             }}
           />
         )}
+
+        {/* Efeito de brilho (glow) */}
+        {lightingEffect && (
+          <div
+            className="absolute rounded-full pointer-events-none"
+            style={{
+              left: `${stone.x - stone.size}px`,
+              top: `${stone.y - stone.size}px`,
+              width: `${stone.size * 2}px`,
+              height: `${stone.size * 2}px`,
+              background: `radial-gradient(circle, ${stone.color}33 0%, transparent 70%)`,
+              opacity: stone.glow,
+              zIndex: 0,
+              filter: "blur(4px)",
+            }}
+          />
+        )}
       </>
     )
+  }
+
+  // Função para obter o estilo da caixa
+  const getBoxStyle = () => {
+    switch (boxStyle) {
+      case "golden":
+        return {
+          background: "linear-gradient(45deg, #d4af37 0%, #f9f295 50%, #d4af37 100%)",
+          boxShadow: "inset 0 0 20px rgba(0,0,0,0.2), 0 10px 30px rgba(0,0,0,0.4)",
+          border: "8px solid",
+          borderImage: "linear-gradient(45deg, #b8860b, #ffd700, #b8860b) 1",
+        }
+      case "wooden":
+        return {
+          background: "linear-gradient(45deg, #8b4513 0%, #a0522d 50%, #8b4513 100%)",
+          boxShadow: "inset 0 0 20px rgba(0,0,0,0.3), 0 10px 30px rgba(0,0,0,0.4)",
+          border: "8px solid",
+          borderImage: "linear-gradient(45deg, #5d2906, #8b4513, #5d2906) 1",
+        }
+      case "dark":
+        return {
+          background: "linear-gradient(45deg, #000000 0%, #1a1a1a 50%, #000000 100%)",
+          boxShadow: "inset 0 0 20px rgba(255,255,255,0.1), 0 10px 30px rgba(0,0,0,0.5)",
+          border: "8px solid",
+          borderImage: "linear-gradient(45deg, #000000, #333333, #000000) 1",
+        }
+      default:
+        return {}
+    }
   }
 
   return (
     <div className="flex flex-col items-center w-full max-w-3xl">
       <div className="flex flex-wrap justify-center gap-2 mb-4">
-        {stoneTypes.slice(0, 12).map((type) => (
+        {stoneTypes.slice(0, showAllStones ? 33 : 12).map((type) => (
           <motion.div key={type.id} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Button
               onClick={() => setSelectedStoneType(type)}
@@ -992,6 +1118,14 @@ export default function VirtualStoneBox() {
             </Button>
           </motion.div>
         ))}
+        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+          <Button
+            onClick={toggleShowAllStones}
+            className="px-3 py-1 rounded-full bg-white/10 border border-white/20 hover:bg-white/20"
+          >
+            {showAllStones ? "Mostrar Menos" : "Mostrar Todas (33)"}
+          </Button>
+        </motion.div>
       </div>
 
       {/* Campo de pergunta com opção de áudio */}
@@ -1030,12 +1164,11 @@ export default function VirtualStoneBox() {
         {/* Virtual Box */}
         <div
           ref={boxRef}
-          className={`virtual-stone-box relative w-full h-[400px] bg-[#f5f5f0] border-8 rounded-md shadow-xl overflow-hidden cursor-pointer transition-all duration-500 ${
+          className={`virtual-stone-box relative w-full h-[400px] rounded-md overflow-hidden cursor-pointer transition-all duration-500 ${
             is3DMode ? "transform-style-3d perspective-800" : ""
           }`}
           style={{
-            boxShadow: "inset 0 0 20px rgba(0,0,0,0.1), 0 10px 30px rgba(0,0,0,0.3)",
-            borderImage: "linear-gradient(45deg, #fff, #d2b48c, #fff) 1",
+            ...getBoxStyle(),
             transform: is3DMode ? "rotateX(20deg)" : "none",
           }}
           onMouseDown={handleMouseDown}
@@ -1043,13 +1176,19 @@ export default function VirtualStoneBox() {
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
         >
-          {/* Box background with wood texture */}
+          {/* Box background with texture */}
           <div
-            className="absolute inset-0 bg-[#d2b48c] opacity-40"
+            className="absolute inset-0 opacity-40"
             style={{
-              backgroundImage: "url('/placeholder.svg?height=400&width=800')",
+              backgroundImage:
+                boxStyle === "golden"
+                  ? "url('/images/golden-box.png')"
+                  : boxStyle === "wooden"
+                    ? "url('/images/glowing-stones.png')"
+                    : "url('/images/colorful-stones.png')",
               backgroundSize: "cover",
               backgroundPosition: "center",
+              filter: boxStyle === "dark" ? "brightness(0.3)" : "none",
             }}
           />
 
@@ -1145,7 +1284,7 @@ export default function VirtualStoneBox() {
               >
                 <div className="relative w-[90%] h-[90%]">
                   <Image
-                    src="/placeholder.svg?height=400&width=800"
+                    src="/images/colorful-stones.png"
                     alt="Exemplo de disposição de pedras"
                     fill
                     className="object-contain"
@@ -1154,8 +1293,40 @@ export default function VirtualStoneBox() {
                     className="absolute top-2 right-2 bg-white/20 rounded-full p-1 hover:bg-white/40 transition-colors"
                     onClick={toggleExample}
                   >
-                    ✕
+                    <X className="h-4 w-4" />
                   </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Stone info overlay */}
+          <AnimatePresence>
+            {showStoneInfo && selectedStoneInfo && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 bg-black/70 flex items-center justify-center z-20"
+              >
+                <div className="bg-black/80 p-6 rounded-lg max-w-md text-center">
+                  <h3 className="text-2xl font-bold mb-2" style={{ color: selectedStoneInfo.color }}>
+                    {selectedStoneInfo.name}
+                  </h3>
+                  <p className="text-white mb-4">{selectedStoneInfo.meaning}</p>
+                  <div
+                    className="w-20 h-20 mx-auto mb-4 rounded-full"
+                    style={{
+                      backgroundColor: selectedStoneInfo.color,
+                      boxShadow: `0 0 20px ${selectedStoneInfo.color}80`,
+                    }}
+                  ></div>
+                  <p className="text-gray-300 mb-4">
+                    Energia: <span className="text-white">{Math.round(selectedStoneInfo.energy)}</span>
+                  </p>
+                  <Button onClick={() => setShowStoneInfo(false)} className="bg-white/10 hover:bg-white/20">
+                    Fechar
+                  </Button>
                 </div>
               </motion.div>
             )}
@@ -1316,11 +1487,36 @@ export default function VirtualStoneBox() {
               <Wand2 className="w-4 h-4 mr-2" /> Energia {energyMode ? "✓" : ""}
             </Button>
           </motion.div>
+
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button
+              onClick={toggleLightingEffect}
+              variant="outline"
+              className={`border transition-colors ${
+                lightingEffect ? "bg-[#8e2de2]/30 border-[#8e2de2]" : "bg-white/5 border-white/20 hover:bg-white/10"
+              }`}
+              disabled={isScanning}
+            >
+              Iluminação {lightingEffect ? "✓" : ""}
+            </Button>
+          </motion.div>
+
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button
+              onClick={cycleBoxStyle}
+              variant="outline"
+              className="bg-white/5 border border-white/20 hover:bg-white/10"
+              disabled={isScanning}
+            >
+              Estilo: {boxStyle === "golden" ? "Dourado" : boxStyle === "wooden" ? "Madeira" : "Escuro"}
+            </Button>
+          </motion.div>
         </div>
       </div>
 
       <div className="mt-4 text-center text-sm text-white/70">
         <p>Clique para adicionar pedras ou arraste para movê-las</p>
+        <p>Shift+Clique em uma pedra para ver suas informações</p>
         <p>Escolha o tipo de pedra nos botões acima</p>
         <p>Use o botão "Auto-Escanear" para analisar a disposição das pedras</p>
       </div>

@@ -1,131 +1,84 @@
 "use client"
 
+import Link from "next/link"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { useAppContext } from "@/contexts/app-context"
-import { Moon, Sun, Menu, X, Home, History, Crown, User, Share2 } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { Menu, X, Home, History, CreditCard, User, Box } from "lucide-react"
 
 export default function MobileNavbar() {
-  const { theme, toggleTheme } = useAppContext()
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const pathname = usePathname()
+  const [isOpen, setIsOpen] = useState(false)
 
-  const menuItems = [
-    { icon: Home, label: "Início", href: "/mobile" },
-    { icon: History, label: "Histórico", href: "/mobile/historico" },
-    { icon: Crown, label: "Assinatura", href: "/mobile/assinatura" },
-    { icon: User, label: "Perfil", href: "/mobile/perfil" },
-  ]
-
-  const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: "A CAIXA - Oráculo Digital com IA",
-          text: "Descubra seu futuro com A CAIXA, o oráculo digital que une misticismo ancestral à inteligência artificial!",
-          url: window.location.href,
-        })
-      } catch (error) {
-        console.log("Erro ao compartilhar:", error)
-      }
-    }
+  const toggleMenu = () => {
+    setIsOpen(!isOpen)
   }
 
   return (
-    <>
-      {/* Barra superior */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-black/30 backdrop-blur-md border-b border-white/10">
-        <div className="px-4 py-3 flex justify-between items-center">
-          <Link href="/mobile" className="flex items-center">
-            <span className="text-2xl mr-2">🔮</span>
-            <span className="font-bold text-xl text-[#e6d8ff]">A CAIXA</span>
-          </Link>
-
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleTheme}
-              className="text-[#e6d8ff] hover:bg-white/10 w-9 h-9"
-            >
-              {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-            </Button>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleShare}
-              className="text-[#e6d8ff] hover:bg-white/10 w-9 h-9"
-            >
-              <Share2 className="h-5 w-5" />
-            </Button>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-[#e6d8ff] hover:bg-white/10 w-9 h-9"
-            >
-              {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </Button>
-          </div>
-        </div>
-
-        {/* Menu expansível */}
-        <AnimatePresence>
-          {isMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="overflow-hidden"
-            >
-              <div className="px-2 pt-2 pb-3 space-y-1 bg-black/30 backdrop-blur-md">
-                {menuItems.map((item) => {
-                  const Icon = item.icon
-                  const isActive = pathname === item.href
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={`flex items-center px-3 py-2 rounded-md text-base font-medium transition-colors ${
-                        isActive ? "bg-[#8e2de2]/30 text-white" : "text-[#e6d8ff] hover:bg-white/10"
-                      }`}
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <Icon className="h-5 w-5 mr-3" />
-                      {item.label}
-                    </Link>
-                  )
-                })}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </nav>
-
-      {/* Barra de navegação inferior */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-black/30 backdrop-blur-md border-t border-white/10">
-        <div className="flex justify-around">
-          {menuItems.map((item) => {
-            const Icon = item.icon
-            const isActive = pathname === item.href
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex flex-col items-center py-2 px-3 ${isActive ? "text-[#ff9be2]" : "text-[#e6d8ff]"}`}
-              >
-                <Icon className="h-5 w-5" />
-                <span className="text-xs mt-1">{item.label}</span>
-              </Link>
-            )
-          })}
-        </div>
+    <nav className="fixed top-0 left-0 right-0 bg-black/50 backdrop-blur-lg z-50 border-b border-white/10">
+      <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+        <Link href="/mobile" className="text-xl font-bold text-white">
+          A Caixa
+        </Link>
+        <Button variant="ghost" size="icon" onClick={toggleMenu} className="text-white">
+          {isOpen ? <X size={24} /> : <Menu size={24} />}
+        </Button>
       </div>
-    </>
+
+      {isOpen && (
+        <div className="container mx-auto px-4 py-4 bg-black/80 border-t border-white/10">
+          <ul className="space-y-3">
+            <li>
+              <Link
+                href="/mobile"
+                className="flex items-center gap-3 p-2 rounded-md hover:bg-white/10 transition-colors"
+                onClick={toggleMenu}
+              >
+                <Home size={20} />
+                <span>Início</span>
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/caixa-virtual"
+                className="flex items-center gap-3 p-2 rounded-md hover:bg-white/10 transition-colors"
+                onClick={toggleMenu}
+              >
+                <Box size={20} />
+                <span>Caixa Virtual</span>
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/mobile/historico"
+                className="flex items-center gap-3 p-2 rounded-md hover:bg-white/10 transition-colors"
+                onClick={toggleMenu}
+              >
+                <History size={20} />
+                <span>Histórico</span>
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/mobile/assinatura"
+                className="flex items-center gap-3 p-2 rounded-md hover:bg-white/10 transition-colors"
+                onClick={toggleMenu}
+              >
+                <CreditCard size={20} />
+                <span>Assinatura</span>
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/mobile/perfil"
+                className="flex items-center gap-3 p-2 rounded-md hover:bg-white/10 transition-colors"
+                onClick={toggleMenu}
+              >
+                <User size={20} />
+                <span>Perfil</span>
+              </Link>
+            </li>
+          </ul>
+        </div>
+      )}
+    </nav>
   )
 }

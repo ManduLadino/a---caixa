@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     const currentTime = new Date().toISOString()
     const uniqueIdentifier = uniqueId || `${Date.now()}-${randomSeed}`
 
-    if (stoneTypes && stoneTypes.length > 0) {
+    if (stoneTypes && Array.isArray(stoneTypes) && stoneTypes.length > 0) {
       // Usar o prompt personalizado baseado nas pedras
       prompt = getMultiStonePrompt(stoneTypes)
 
@@ -62,7 +62,7 @@ export async function POST(request: Request) {
 - Momento da consulta: ${currentTime}`
 
       // Adicionar informações sobre as posições das pedras se disponíveis
-      if (stonePositions && stonePositions.length > 0) {
+      if (stonePositions && Array.isArray(stonePositions) && stonePositions.length > 0) {
         prompt += `\n\nDisposição das pedras:
 - Total de pedras: ${stonePositions.length}
 - Padrão: ${stonePositions.length > 20 ? "Complexo" : "Simples"}

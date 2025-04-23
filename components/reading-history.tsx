@@ -8,7 +8,7 @@ import { ScrollText, Calendar, Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { motion, AnimatePresence } from "framer-motion"
 import { formatDate, truncateText } from "@/lib/utils"
-import MandalaGenerator from "@/components/mandala-generator"
+import { MandalaGenerator } from "@/components/mandala-generator"
 
 export default function ReadingHistory() {
   const { readings } = useAppContext()
@@ -77,7 +77,13 @@ export default function ReadingHistory() {
                       >
                         <div className="flex flex-col md:flex-row gap-4">
                           <div className="w-32 h-32 mx-auto md:mx-0 flex-shrink-0">
-                            <MandalaGenerator params={reading.mandalaParams} size={128} className="rounded-full" />
+                            <MandalaGenerator
+                              params={reading.mandalaParams}
+                              size={128}
+                              className="rounded-full"
+                              animate={true}
+                              highQuality={false} // Use lower quality for thumbnails to improve performance
+                            />
                           </div>
                           <div className="flex-grow">
                             <div className="bg-white/5 rounded-lg p-4 max-h-[200px] overflow-y-auto">

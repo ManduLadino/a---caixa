@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { HolographicCard } from "@/components/ui/holographic-card"
-import MandalaGenerator from "@/components/mandala-generator"
+import { MandalaGenerator } from "@/components/mandala-generator"
 import { Play, Pause, Download, Share2 } from "lucide-react"
 import { motion } from "framer-motion"
 
@@ -230,7 +230,13 @@ export default function ReadingResult({ reading, mandalaParams, onClose }: Readi
             <div className="flex-shrink-0 flex flex-col items-center">
               <div className="relative w-64 h-64 mb-4">
                 <div className="absolute inset-0 rounded-full animate-spin-slow" style={{ animationDuration: "120s" }}>
-                  <MandalaGenerator params={mandalaParams} size={256} className="rounded-full" />
+                  <MandalaGenerator
+                    params={mandalaParams}
+                    size={256}
+                    className="rounded-full"
+                    animate={true}
+                    highQuality={true}
+                  />
                 </div>
               </div>
 

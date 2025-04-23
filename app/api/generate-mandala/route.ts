@@ -8,10 +8,10 @@ const openai = new OpenAI({
 // Default mandala parameters as fallback
 const defaultMandalaParams = {
   colors: ["#8e2de2", "#ff9be2", "#6a1fc7", "#36005d", "#c774f0"],
-  layers: 5,
-  shape: "circle",
-  complexity: 7,
-  symbols: ["estrela", "espiral", "lua"],
+  layers: 6,
+  shape: "flower", // Use the new flower shape as default
+  complexity: 8,
+  symbols: ["estrela", "espiral", "lua", "flor", "olho"],
 }
 
 // Lista de cores para variação

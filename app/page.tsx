@@ -87,6 +87,8 @@ export default function Home() {
           birthDate: birthdate,
           question,
           stoneTypes: [], // Adiciona um array vazio para evitar erros
+          timestamp: Date.now(), // Adiciona timestamp para garantir unicidade
+          uniqueId: Math.random().toString(36).substring(2, 15), // ID único adicional
         }),
       })
 
@@ -134,7 +136,10 @@ O futuro se mostra promissor, com novas oportunidades surgindo em seu caminho. M
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ reading }),
+          body: JSON.stringify({
+            reading,
+            timestamp: Date.now(), // Adiciona timestamp para garantir unicidade
+          }),
         })
 
         if (!mandalaResponse.ok) {
@@ -164,33 +169,6 @@ O futuro se mostra promissor, com novas oportunidades surgindo em seu caminho. M
             },
           }
         }
-
-        const result = {
-          reading,
-          mandalaParams: mandalaData.params || {
-            colors: ["#8e2de2", "#ff9be2", "#6a1fc7", "#36005d", "#c774f0"],
-            layers: 5,
-            shape: "circle",
-            complexity: 7,
-            symbols: ["estrela", "espiral", "lua"],
-          },
-        }
-
-        // Define o resultado da leitura
-        setReadingResult(result)
-
-        // Adiciona a leitura ao histórico
-        addReading({
-          question,
-          reading,
-          mandalaParams: mandalaData.params || {
-            colors: ["#8e2de2", "#ff9be2", "#6a1fc7", "#36005d", "#c774f0"],
-            layers: 5,
-            shape: "circle",
-            complexity: 7,
-            symbols: ["estrela", "espiral", "lua"],
-          },
-        })
       } catch (mandalaError) {
         console.error("Erro ao gerar mandala:", mandalaError)
 
@@ -221,6 +199,33 @@ O futuro se mostra promissor, com novas oportunidades surgindo em seu caminho. M
           },
         })
       }
+
+      const result = {
+        reading,
+        mandalaParams: mandalaData.params || {
+          colors: ["#8e2de2", "#ff9be2", "#6a1fc7", "#36005d", "#c774f0"],
+          layers: 5,
+          shape: "circle",
+          complexity: 7,
+          symbols: ["estrela", "espiral", "lua"],
+        },
+      }
+
+      // Define o resultado da leitura
+      setReadingResult(result)
+
+      // Adiciona a leitura ao histórico
+      addReading({
+        question,
+        reading,
+        mandalaParams: mandalaData.params || {
+          colors: ["#8e2de2", "#ff9be2", "#6a1fc7", "#36005d", "#c774f0"],
+          layers: 5,
+          shape: "circle",
+          complexity: 7,
+          symbols: ["estrela", "espiral", "lua"],
+        },
+      })
     } catch (error) {
       console.error("Erro ao processar a leitura:", error)
 
