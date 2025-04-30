@@ -34,14 +34,13 @@ export default function Logo3D() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
           <Link href="/" className="flex items-center">
-            <div className="relative h-16 w-auto">
+            <div className="relative h-16 w-auto mr-3">
               <Image
-                src="/images/a-caixa-official-logo.png"
+                src="/images/a-caixa-logo.png"
                 alt="A CAIXA - Oráculo Místico"
-                width={140}
-                height={140}
+                width={120}
+                height={64}
                 className="object-contain"
-                priority
               />
             </div>
           </Link>

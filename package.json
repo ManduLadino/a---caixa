@@ -70,7 +70,10 @@
     "openai": "latest",
     "framer-motion": "latest",
     "chart.js": "latest",
-    "@react-three/drei": "latest"
+    "@react-three/drei": "latest",
+    "@react-three/postprocessing": "latest",
+    "postprocessing": "latest",
+    "@react-spring/three": "latest"
   },
   "devDependencies": {
     "@types/node": "^22",

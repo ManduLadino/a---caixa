@@ -15,6 +15,19 @@ export default function Footer3D() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
+            <div className="flex items-center mb-4">
+              <Image
+                src="/images/a-caixa-logo.png"
+                alt="A CAIXA - Oráculo Místico"
+                width={120}
+                height={64}
+                className="object-contain"
+              />
+            </div>
+            <p className="text-sm text-amber-100/70">TUDO ESTÁ DENTRO: O QUE FOI, O QUE É, O QUE VIRÁ.</p>
+          </div>
+
+          <div>
             <h3 className="text-lg font-semibold mb-4 text-amber-400">Navegação</h3>
             <ul className="space-y-2">
               <li>
@@ -49,22 +62,13 @@ export default function Footer3D() {
             >
               Entre em contato
             </Link>
-            <p className="text-xs text-amber-100/50 mt-4">
-              &copy; {new Date().getFullYear()} A CAIXA - Oráculo Místico. Todos os direitos reservados.
-            </p>
           </div>
+        </div>
 
-          <div className="flex justify-end items-center">
-            <div className="relative h-32 w-32">
-              <Image
-                src="/images/a-caixa-logo.png"
-                alt="A CAIXA - Oráculo Místico"
-                width={150}
-                height={150}
-                className="object-contain"
-              />
-            </div>
-          </div>
+        <div className="border-t border-amber-400/10 mt-8 pt-8 text-center">
+          <p className="text-xs text-amber-100/50">
+            &copy; {new Date().getFullYear()} A CAIXA - Oráculo Místico. Todos os direitos reservados.
+          </p>
         </div>
       </div>
     </motion.footer>
