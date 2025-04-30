@@ -1,13 +1,17 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import type React from "react"
+
+import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { X } from "lucide-react"
 import { GlowText } from "@/components/ui/glow-text"
 
-// Definição das pedras com suas propriedades
+// Vamos reduzir o tamanho do componente e focar apenas nas pedras principais
+
+// Mantenha a definição de crystalData, mas reduza para apenas 15 pedras principais
 const crystalData = [
   {
     id: 1,
@@ -100,14 +104,6 @@ const crystalData = [
   },
   {
     id: 12,
-    name: "Cianita Negra",
-    keywords: "Limpeza Energética, Proteção, Aterramento, Alinhamento",
-    description: "Conhecida como 'Vassoura de Bruxa', é uma ferramenta poderosa para limpeza energética profunda.",
-    color: "#2F4F4F",
-    image: "/black-kyanite-crystal.png",
-  },
-  {
-    id: 13,
     name: "Citrino",
     keywords: "Prosperidade, Alegria, Sucesso, Energia Solar",
     description: "Conhecido como a pedra da abundância e prosperidade, ensina a manifestar e atrair riqueza.",
@@ -115,7 +111,7 @@ const crystalData = [
     image: "/citrine-crystal.png",
   },
   {
-    id: 14,
+    id: 13,
     name: "Cornalina",
     keywords: "Vitalidade, Coragem, Criatividade, Motivação",
     description: "Repleta de energia vital, promove coragem, criatividade e motivação.",
@@ -123,303 +119,47 @@ const crystalData = [
     image: "/carnelian-crystal.png",
   },
   {
-    id: 15,
-    name: "Crisoprásio",
-    keywords: "Verdade, Esperança, Compaixão, Criatividade",
-    description:
-      "Promove o amor pela verdade, a esperança e o autoconhecimento, induzindo a estados meditativos profundos.",
-    color: "#00A86B",
-    image: "/chrysoprase-crystal.png",
-  },
-  {
-    id: 16,
-    name: "Cristal de Rocha",
-    keywords: "Amplificação, Clareza, Cura Universal, Energia",
-    description:
-      "Considerado o 'mestre curador', é altamente energético e versátil, amplificando a energia e a intenção.",
-    color: "#F5F5F5",
-    image: "/placeholder.svg?height=100&width=100&query=clear+quartz+crystal",
-  },
-  {
-    id: 17,
-    name: "Esmeralda",
-    keywords: "Amor Bem-Sucedido, Inspiração, Abundância, Equilíbrio",
-    description:
-      "Conhecida como a 'pedra do amor bem-sucedido', promove a felicidade doméstica e o amor incondicional.",
-    color: "#50C878",
-    image: "/placeholder.svg?height=100&width=100&query=emerald+crystal",
-  },
-  {
-    id: 18,
-    name: "Fluorita",
-    keywords: "Proteção Psíquica, Clareza Mental, Organização, Aprendizado",
-    description: "Uma pedra de grande proteção, especialmente contra influências externas e manipulação psíquica.",
-    color: "#9966CC",
-    image: "/placeholder.svg?height=100&width=100&query=fluorite+crystal",
-  },
-  {
-    id: 19,
-    name: "Granada",
-    keywords: "Paixão, Vitalidade, Coragem, Regeneração",
-    description: "Irradia paixão, vitalidade e energia. Fortalece a determinação, a coragem e a esperança.",
-    color: "#7B1113",
-    image: "/placeholder.svg?height=100&width=100&query=garnet+crystal",
-  },
-  {
-    id: 20,
-    name: "Hematita",
-    keywords: "Aterramento, Proteção, Força de Vontade, Foco",
-    description: "Perfeita para aterramento e proteção, harmoniza corpo, mente e espírito.",
-    color: "#2C3539",
-    image: "/placeholder.svg?height=100&width=100&query=hematite+crystal",
-  },
-  {
-    id: 21,
-    name: "Howlita Branca",
-    keywords: "Calma, Paciência, Sono Tranquilo, Conhecimento",
-    description: "Uma pedra extremamente calmante, excelente para combater a insônia e acalmar a mente hiperativa.",
-    color: "#F5F5F5",
-    image: "/placeholder.svg?height=100&width=100&query=white+howlite+crystal",
-  },
-  {
-    id: 22,
-    name: "Jade",
-    keywords: "Serenidade, Sorte, Harmonia, Sabedoria",
-    description: "Símbolo de serenidade, pureza e sabedoria. É uma pedra protetora que traz harmonia.",
-    color: "#00A86B",
-    image: "/placeholder.svg?height=100&width=100&query=jade+crystal",
-  },
-  {
-    id: 23,
-    name: "Jaspe Vermelho",
-    keywords: "Estabilidade, Força, Proteção, Vitalidade",
-    description:
-      "Uma pedra de estabilidade, força e vitalidade. Oferece um aterramento suave e auxilia em momentos difíceis.",
-    color: "#B22222",
-    image: "/placeholder.svg?height=100&width=100&query=red+jasper+crystal",
-  },
-  {
-    id: 24,
-    name: "Labradorita",
-    keywords: "Proteção Mística, Intuição, Transformação, Consciência",
-    description:
-      "Uma pedra mística e protetora, portadora de luz. Eleva a consciência e conecta com as energias universais.",
-    color: "#6C7A89",
-    image: "/placeholder.svg?height=100&width=100&query=labradorite+crystal",
-  },
-  {
-    id: 25,
-    name: "Lápis-Lazúli",
-    keywords: "Sabedoria, Verdade, Intuição, Paz Interior",
-    description:
-      "Abre o terceiro olho e equilibra o chakra da garganta. É uma pedra protetora que facilita o contato espiritual.",
-    color: "#26619C",
-    image: "/placeholder.svg?height=100&width=100&query=lapis+lazuli+crystal",
-  },
-  {
-    id: 26,
-    name: "Malaquita",
-    keywords: "Transformação, Cura Emocional, Proteção, Manifestação",
-    description:
-      "Uma poderosa pedra de transformação e cura profunda. Amplifica energias e aterra energias espirituais.",
-    color: "#004D40",
-    image: "/placeholder.svg?height=100&width=100&query=malachite+crystal",
-  },
-  {
-    id: 27,
-    name: "Obsidiana Floco de Neve",
-    keywords: "Equilíbrio, Purificação, Centramento, Reconhecimento de Padrões",
-    description:
-      "Proporciona equilíbrio entre corpo, mente e espírito. Ajuda a reconhecer e liberar padrões de pensamento equivocados.",
-    color: "#2F4F4F",
-    image: "/placeholder.svg?height=100&width=100&query=snowflake+obsidian+crystal",
-  },
-  {
-    id: 28,
-    name: "Olho de Tigre",
-    keywords: "Proteção, Clareza Mental, Coragem, Equilíbrio",
-    description: "Uma pedra protetora tradicionalmente usada como talismã contra maldições e mau-olhado.",
-    color: "#B8860B",
-    image: "/placeholder.svg?height=100&width=100&query=tigers+eye+crystal",
-  },
-  {
-    id: 29,
-    name: "Ônix",
-    keywords: "Força, Proteção, Autocontrole, Estabilidade",
-    description: "Confere força e apoio em circunstâncias difíceis ou confusas e durante períodos de grande stress.",
-    color: "#0A0A0A",
-    image: "/placeholder.svg?height=100&width=100&query=onyx+crystal",
-  },
-  {
-    id: 30,
-    name: "Pedra da Lua",
-    keywords: "Novos Começos, Intuição, Emoções, Energia Feminina",
-    description: "Conhecida como a 'pedra de novos começos', tem forte ligação com a Lua e a intuição.",
-    color: "#F5F5F5",
-    image: "/placeholder.svg?height=100&width=100&query=moonstone+crystal",
-  },
-  {
-    id: 31,
-    name: "Pedra do Sol",
-    keywords: "Alegria de Viver, Vitalidade, Otimismo, Boa Sorte",
-    description:
-      "Uma pedra vibrante e inspiradora que instila a alegria de viver e a boa natureza, intensificando a intuição.",
-    color: "#E67E22",
-    image: "/placeholder.svg?height=100&width=100&query=sunstone+crystal",
-  },
-  {
-    id: 32,
-    name: "Pirita",
-    keywords: "Prosperidade, Proteção, Sucesso, Abundância",
-    description: "Um excelente escudo energético que bloqueia energias negativas e poluentes em todos os níveis.",
-    color: "#CFB53B",
-    image: "/placeholder.svg?height=100&width=100&query=pyrite+crystal",
-  },
-  {
-    id: 33,
-    name: "Quartzo Fumê",
-    keywords: "Aterramento, Proteção, Dissipação de Negatividade, Calma",
-    description:
-      "Uma das pedras mais eficientes para aterrar e ancorar energias, ao mesmo tempo que eleva as vibrações.",
-    color: "#2F4F4F",
-    image: "/placeholder.svg?height=100&width=100&query=smoky+quartz+crystal",
-  },
-  {
-    id: 34,
+    id: 14,
     name: "Quartzo Rosa",
     keywords: "Amor Incondicional, Cura Emocional, Paz, Compaixão",
     description: "A pedra do amor incondicional e da paz infinita. É o cristal mais importante para o coração.",
     color: "#F4C2C2",
-    image: "/placeholder.svg?height=100&width=100&query=rose+quartz+crystal",
+    image: "/rose-quartz-crystal.png",
   },
   {
-    id: 35,
-    name: "Quartzo Verde",
-    keywords: "Saúde, Cura, Vitalidade, Equilíbrio Emocional",
-    description: "Considerada uma pedra de cura, vitalidade e energização. Transmite a energia curativa do Raio Verde.",
-    color: "#00A86B",
-    image: "/placeholder.svg?height=100&width=100&query=green+aventurine+crystal",
-  },
-  {
-    id: 36,
-    name: "Rodocrosita",
-    keywords: "Amor Altruísta, Compaixão, Cura Emocional, Autoestima",
-    description:
-      "Representa o amor altruísta e a compaixão. Expande a consciência e integra as energias espirituais e materiais.",
-    color: "#E77471",
-    image: "/placeholder.svg?height=100&width=100&query=rhodochrosite+crystal",
-  },
-  {
-    id: 37,
-    name: "Rodonita",
-    keywords: "Equilíbrio Emocional, Cura de Traumas, Amor Fraterno, Perdão",
-    description: "Um equilibrador emocional que inspira o amor e estimula a fraternidade entre os seres humanos.",
-    color: "#E77471",
-    image: "/placeholder.svg?height=100&width=100&query=rhodonite+crystal",
-  },
-  {
-    id: 38,
-    name: "Selenita Branca",
-    keywords: "Purificação, Paz Profunda, Conexão Espiritual, Limpeza Energética",
-    description: "Possui uma vibração muito fina e é considerada uma das pedras de purificação mais poderosas.",
-    color: "#F5F5F5",
-    image: "/placeholder.svg?height=100&width=100&query=white+selenite+crystal",
-  },
-  {
-    id: 39,
-    name: "Sodalita",
-    keywords: "Lógica, Intuição, Comunicação, Clareza Mental",
-    description: "Une lógica e intuição, abrindo a percepção espiritual e estimulando o terceiro olho.",
-    color: "#4682B4",
-    image: "/placeholder.svg?height=100&width=100&query=sodalite+crystal",
-  },
-  {
-    id: 40,
+    id: 15,
     name: "Turmalina Negra",
     keywords: "Proteção Suprema, Aterramento, Limpeza Energética, Neutralização",
     description: "Considerada a pedra de proteção mais completa contra energias negativas e ataques psíquicos.",
     color: "#2C3539",
-    image: "/placeholder.svg?height=100&width=100&query=black+tourmaline+crystal",
-  },
-  {
-    id: 41,
-    name: "Turquesa",
-    keywords: "Proteção, Boa Sorte, Comunicação, Bem-Estar",
-    description: "Uma pedra de proteção muito eficiente, usada como amuleto desde tempos remotos.",
-    color: "#40E0D0",
-    image: "/placeholder.svg?height=100&width=100&query=turquoise+crystal",
-  },
-  {
-    id: 42,
-    name: "Unakita",
-    keywords: "Visão Interior, Equilíbrio, Renascimento, Cura de Vidas Passadas",
-    description: "Uma pedra de visão e equilíbrio. Ancora energias quando necessário e pode ser útil após meditação.",
-    color: "#8B4513",
-    image: "/placeholder.svg?height=100&width=100&query=unakite+crystal",
-  },
-  {
-    id: 43,
-    name: "Zoisita com Rubi",
-    keywords: "Vitalidade, Cura, Individualidade, Conexão com a Natureza",
-    description:
-      "Promove a vitalidade e a cura, fortalecendo o sistema imunológico e estimulando a regeneração celular.",
-    color: "#006400",
-    image: "/placeholder.svg?height=100&width=100&query=ruby+zoisite+crystal",
-  },
-  {
-    id: 44,
-    name: "Ágata Roxa",
-    keywords: "Estabilidade, Coragem, Espiritualidade, Justiça",
-    description:
-      "Traz estabilidade, coragem, segurança e sorte. Em algumas tradições, é considerada um antídoto para venenos.",
-    color: "#800080",
-    image: "/placeholder.svg?height=100&width=100&query=purple+agate+crystal",
+    image: "/black-tourmaline-crystal.png",
   },
 ]
 
-// Componente para o armário de cristais simplificado
+// Modifique o componente para ser mais compacto
 export default function SimplifiedCrystalCabinet() {
-  const [doorsOpen, setDoorsOpen] = useState(false)
-  const [drawerOpen, setDrawerOpen] = useState(false)
   const [selectedCrystal, setSelectedCrystal] = useState<number | null>(null)
   const [showInfo, setShowInfo] = useState(false)
   const [stonesInDrawer, setStonesInDrawer] = useState<number[]>([])
-  const cabinetRef = useRef<HTMLDivElement>(null)
-  const [cabinetHeight, setCabinetHeight] = useState(0)
-
-  // Atualiza a altura do armário quando o componente é montado
-  useEffect(() => {
-    if (cabinetRef.current) {
-      setCabinetHeight(cabinetRef.current.offsetHeight)
-    }
-  }, [])
-
-  // Função para abrir/fechar as portas
-  const toggleDoors = () => {
-    setDoorsOpen(!doorsOpen)
-    if (drawerOpen) setDrawerOpen(false)
-  }
-
-  // Função para abrir/fechar a gaveta
-  const toggleDrawer = () => {
-    setDrawerOpen(!drawerOpen)
-    if (doorsOpen) setDoorsOpen(false)
-  }
 
   // Função para selecionar um cristal
   const handleCrystalClick = (id: number) => {
-    if (drawerOpen) {
-      // Se a gaveta estiver aberta, adiciona ou remove a pedra da gaveta
-      if (stonesInDrawer.includes(id)) {
-        setStonesInDrawer(stonesInDrawer.filter((stoneId) => stoneId !== id))
-      } else {
+    // Se a pedra já estiver na caixa, remova-a
+    if (stonesInDrawer.includes(id)) {
+      setStonesInDrawer(stonesInDrawer.filter((stoneId) => stoneId !== id))
+    } else {
+      // Caso contrário, adicione-a (limitando a 5 pedras)
+      if (stonesInDrawer.length < 5) {
         setStonesInDrawer([...stonesInDrawer, id])
       }
-    } else {
-      // Se a gaveta estiver fechada, mostra informações da pedra
-      setSelectedCrystal(id)
-      setShowInfo(true)
     }
+  }
+
+  // Função para mostrar informações da pedra
+  const showCrystalInfo = (id: number, e: React.MouseEvent) => {
+    e.stopPropagation()
+    setSelectedCrystal(id)
+    setShowInfo(true)
   }
 
   // Função para fechar o modal de informações
@@ -427,78 +167,91 @@ export default function SimplifiedCrystalCabinet() {
     setShowInfo(false)
   }
 
-  // Organiza os cristais em prateleiras (11 cristais por prateleira, 4 prateleiras)
-  const shelves = Array.from({ length: 4 }, (_, i) => crystalData.slice(i * 11, (i + 1) * 11))
-
   return (
-    <div className="relative w-full max-w-6xl mx-auto h-[90vh] flex flex-col items-center justify-center">
-      {/* Armário principal */}
+    <div className="relative w-full max-w-4xl mx-auto">
+      {/* Armário principal inspirado na imagem de referência */}
       <div
-        ref={cabinetRef}
-        className="relative w-full max-w-5xl h-[70vh] bg-black/20 backdrop-blur-sm rounded-lg overflow-hidden border-8"
+        className="relative w-full bg-gradient-to-b from-amber-800 to-amber-700 rounded-lg overflow-hidden border-8 p-6"
         style={{
-          borderImage: "linear-gradient(45deg, #d4af37, #ffd700, #d4af37) 1",
-          boxShadow: "0 0 20px rgba(212, 175, 55, 0.5)",
+          borderImage: "linear-gradient(45deg, #d4af37, #8B4513, #d4af37) 1",
+          boxShadow: "0 0 20px rgba(139, 69, 19, 0.5)",
         }}
       >
-        {/* Portas de vidro do armário */}
-        <div className="absolute inset-0 flex">
-          {/* Porta esquerda */}
-          <motion.div
-            className="w-1/2 h-full bg-blue-50/10 backdrop-blur-sm border-r-4"
-            style={{
-              borderImage: "linear-gradient(to bottom, #d4af37, #ffd700, #d4af37) 1",
-              transformOrigin: "left",
-              boxShadow: "inset 0 0 10px rgba(255, 255, 255, 0.3)",
-            }}
-            animate={{
-              rotateY: doorsOpen ? -105 : 0,
-            }}
-            transition={{ duration: 0.8, ease: "easeInOut" }}
-          >
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 w-2 h-16 bg-gradient-to-b from-[#d4af37] via-[#ffd700] to-[#d4af37] rounded-full" />
-          </motion.div>
-
-          {/* Porta direita */}
-          <motion.div
-            className="w-1/2 h-full bg-blue-50/10 backdrop-blur-sm border-l-4"
-            style={{
-              borderImage: "linear-gradient(to bottom, #d4af37, #ffd700, #d4af37) 1",
-              transformOrigin: "right",
-              boxShadow: "inset 0 0 10px rgba(255, 255, 255, 0.3)",
-            }}
-            animate={{
-              rotateY: doorsOpen ? 105 : 0,
-            }}
-            transition={{ duration: 0.8, ease: "easeInOut" }}
-          >
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 w-2 h-16 bg-gradient-to-b from-[#d4af37] via-[#ffd700] to-[#d4af37] rounded-full" />
-          </motion.div>
+        <div className="text-center mb-6">
+          <h2 className="text-2xl font-bold text-amber-100">
+            <GlowText glowColor="#ffd700">A CAIXA MÍSTICA</GlowText>
+          </h2>
+          <p className="text-amber-200 text-sm">Selecione até 5 pedras para sua leitura</p>
         </div>
 
-        {/* Interior do armário com prateleiras */}
-        <div className="absolute inset-0 flex flex-col justify-between p-4">
-          {shelves.map((shelf, shelfIndex) => (
-            <div key={shelfIndex} className="flex justify-around items-center h-1/4 relative">
-              {/* Prateleira */}
-              <div className="absolute inset-x-0 h-1 bg-gradient-to-r from-[#d4af37] via-[#ffd700] to-[#d4af37] bottom-0" />
+        {/* Grade de cristais */}
+        <div className="grid grid-cols-3 md:grid-cols-5 gap-4 mb-8">
+          {crystalData.map((crystal) => (
+            <motion.div
+              key={crystal.id}
+              className={`relative cursor-pointer group ${
+                stonesInDrawer.includes(crystal.id) ? "ring-2 ring-amber-300 ring-offset-2 ring-offset-amber-800" : ""
+              }`}
+              whileHover={{ scale: 1.05 }}
+              onClick={() => handleCrystalClick(crystal.id)}
+            >
+              <div
+                className="w-full aspect-square rounded-md relative overflow-hidden"
+                style={{
+                  backgroundColor: crystal.color,
+                  boxShadow: `0 0 10px ${crystal.color}80`,
+                }}
+              >
+                <Image
+                  src={crystal.image || "/placeholder.svg"}
+                  alt={crystal.name}
+                  fill
+                  className="object-cover mix-blend-overlay"
+                />
+                <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent opacity-50" />
+              </div>
+              <div className="text-center mt-2 text-amber-100 text-xs font-medium">{crystal.name}</div>
+              <button
+                onClick={(e) => showCrystalInfo(crystal.id, e)}
+                className="absolute top-1 right-1 w-5 h-5 rounded-full bg-amber-800/70 text-amber-200 flex items-center justify-center text-xs"
+              >
+                i
+              </button>
+            </motion.div>
+          ))}
+        </div>
 
-              {/* Cristais na prateleira */}
-              <div className="flex justify-around w-full">
-                {shelf.map((crystal) => (
+        {/* A CAIXA - Área das pedras selecionadas */}
+        <div
+          className="bg-gradient-to-b from-amber-900/80 to-amber-800/80 backdrop-blur-sm rounded-lg p-4 border-2"
+          style={{
+            borderImage: "linear-gradient(to right, #d4af37, #8B4513, #d4af37) 1",
+          }}
+        >
+          <h3 className="text-xl font-bold text-amber-100 mb-4 text-center">
+            <GlowText glowColor="#ffd700">Pedras Selecionadas</GlowText>
+          </h3>
+
+          {stonesInDrawer.length === 0 ? (
+            <p className="text-center text-amber-200/80 py-4">Selecione pedras acima para colocá-las na CAIXA.</p>
+          ) : (
+            <div className="flex flex-wrap gap-4 justify-center">
+              {stonesInDrawer.map((id) => {
+                const crystal = crystalData.find((c) => c.id === id)
+                if (!crystal) return null
+
+                return (
                   <motion.div
                     key={crystal.id}
-                    className={`relative cursor-pointer group ${
-                      stonesInDrawer.includes(crystal.id) && drawerOpen ? "opacity-50" : "opacity-100"
-                    }`}
-                    whileHover={{ scale: 1.1, y: -5 }}
+                    className="relative cursor-pointer"
+                    whileHover={{ scale: 1.1 }}
                     onClick={() => handleCrystalClick(crystal.id)}
                   >
                     <div
                       className="w-16 h-16 rounded-md relative overflow-hidden"
                       style={{
                         backgroundColor: crystal.color,
-                        boxShadow: `0 0 10px ${crystal.color}80`,
+                        boxShadow: `0 0 15px ${crystal.color}`,
                       }}
                     >
                       <Image
@@ -509,121 +262,23 @@ export default function SimplifiedCrystalCabinet() {
                       />
                       <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent opacity-50" />
                     </div>
-                    <div className="opacity-0 group-hover:opacity-100 absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-white bg-black/70 px-2 py-1 rounded whitespace-nowrap transition-opacity">
+                    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-xs text-amber-200 bg-amber-900/90 px-2 py-0.5 rounded-full whitespace-nowrap">
                       {crystal.name}
                     </div>
                   </motion.div>
-                ))}
-              </div>
+                )
+              })}
             </div>
-          ))}
+          )}
+
+          {stonesInDrawer.length > 0 && (
+            <div className="mt-6 text-center">
+              <Button className="bg-gradient-to-r from-amber-600 to-amber-500 text-white hover:from-amber-500 hover:to-amber-400">
+                Realizar Leitura
+              </Button>
+            </div>
+          )}
         </div>
-
-        {/* Gaveta inferior (A CAIXA) */}
-        <motion.div
-          className="absolute bottom-0 inset-x-0 h-1/5 bg-gradient-to-b from-[#d4af37]/20 to-[#d4af37]/40 backdrop-blur-sm border-t-4 flex items-center justify-center"
-          style={{
-            borderImage: "linear-gradient(to right, #d4af37, #ffd700, #d4af37) 1",
-            boxShadow: "inset 0 0 10px rgba(255, 255, 255, 0.3)",
-          }}
-          animate={{
-            y: drawerOpen ? cabinetHeight * 0.2 : 0,
-          }}
-          transition={{ duration: 0.5, ease: "easeInOut" }}
-        >
-          <div className="absolute top-2 left-1/2 -translate-x-1/2 w-24 h-2 bg-gradient-to-r from-[#d4af37] via-[#ffd700] to-[#d4af37] rounded-full" />
-          <h2 className="text-2xl font-bold text-white">
-            <GlowText glowColor="#ffd700">A CAIXA</GlowText>
-          </h2>
-        </motion.div>
-
-        {/* Conteúdo da gaveta quando aberta (A CAIXA) */}
-        <motion.div
-          className="absolute top-full inset-x-0 h-[20vh] bg-gradient-to-b from-[#d4af37]/30 to-[#d4af37]/60 backdrop-blur-md border-4 rounded-b-lg flex items-center justify-center overflow-hidden"
-          style={{
-            borderImage: "linear-gradient(45deg, #d4af37, #ffd700, #d4af37) 1",
-            boxShadow: "0 10px 20px rgba(0, 0, 0, 0.3), inset 0 0 20px rgba(255, 255, 255, 0.2)",
-          }}
-          initial={{ y: 0 }}
-          animate={{
-            y: drawerOpen ? -cabinetHeight * 0.2 : 0,
-          }}
-          transition={{ duration: 0.5, ease: "easeInOut" }}
-        >
-          {/* Interior da CAIXA */}
-          <div className="relative w-full h-full p-6 flex flex-col items-center">
-            <h3 className="text-xl font-bold text-white mb-4 relative z-10">A CAIXA</h3>
-
-            {stonesInDrawer.length === 0 ? (
-              <p className="text-center text-white/80 max-w-md relative z-10">
-                Selecione pedras das prateleiras enquanto a gaveta estiver aberta para colocá-las aqui.
-              </p>
-            ) : (
-              <div className="flex flex-wrap gap-2 justify-center max-w-md relative z-10">
-                {stonesInDrawer.map((id) => {
-                  const crystal = crystalData.find((c) => c.id === id)
-                  if (!crystal) return null
-
-                  return (
-                    <motion.div
-                      key={crystal.id}
-                      className="relative cursor-pointer"
-                      whileHover={{ scale: 1.1 }}
-                      onClick={() => handleCrystalClick(crystal.id)}
-                    >
-                      <div
-                        className="w-12 h-12 rounded-md relative overflow-hidden"
-                        style={{
-                          backgroundColor: crystal.color,
-                          boxShadow: `0 0 10px ${crystal.color}80`,
-                        }}
-                      >
-                        <Image
-                          src={crystal.image || "/placeholder.svg"}
-                          alt={crystal.name}
-                          fill
-                          className="object-cover mix-blend-overlay"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent opacity-50" />
-                      </div>
-                    </motion.div>
-                  )
-                })}
-              </div>
-            )}
-
-            <div className="mt-4 text-center text-white/80 text-sm relative z-10">
-              {stonesInDrawer.length > 0 && <p>Clique nas pedras para removê-las da CAIXA</p>}
-            </div>
-
-            <div className="absolute inset-0 bg-gradient-to-br from-[#ffd700]/10 via-transparent to-[#ffd700]/10 animate-pulse-slow" />
-          </div>
-        </motion.div>
-      </div>
-
-      {/* Botões de controle */}
-      <div className="flex gap-4 mt-6">
-        <Button
-          onClick={toggleDoors}
-          className="bg-gradient-to-r from-[#d4af37] to-[#ffd700] text-black hover:from-[#ffd700] hover:to-[#d4af37]"
-        >
-          {doorsOpen ? "Fechar Armário" : "Abrir Armário"}
-        </Button>
-        <Button
-          onClick={toggleDrawer}
-          className="bg-gradient-to-r from-[#d4af37] to-[#ffd700] text-black hover:from-[#ffd700] hover:to-[#d4af37]"
-        >
-          {drawerOpen ? "Fechar A CAIXA" : "Abrir A CAIXA"}
-        </Button>
-      </div>
-
-      {/* Instruções para o usuário */}
-      <div className="mt-4 text-center text-sm text-white/80">
-        {drawerOpen ? (
-          <p>Clique nas pedras nas prateleiras para adicioná-las à CAIXA</p>
-        ) : (
-          <p>Abra o armário para ver as pedras. Abra A CAIXA para selecionar pedras.</p>
-        )}
       </div>
 
       {/* Modal de informações do cristal */}
@@ -640,7 +295,7 @@ export default function SimplifiedCrystalCabinet() {
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
-              className="bg-gradient-to-br from-gray-900 to-gray-800 border border-[#d4af37]/50 rounded-lg p-6 max-w-md w-full"
+              className="bg-gradient-to-br from-amber-900 to-amber-800 border border-amber-600/50 rounded-lg p-6 max-w-md w-full"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Cristal selecionado */}
@@ -667,31 +322,31 @@ export default function SimplifiedCrystalCabinet() {
                           />
                           <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent opacity-50" />
                         </div>
-                        <h3 className="text-2xl font-bold text-white">{crystal.name}</h3>
+                        <h3 className="text-2xl font-bold text-amber-100">{crystal.name}</h3>
                       </div>
                       <Button
                         variant="ghost"
                         size="icon"
                         onClick={closeInfo}
-                        className="text-gray-400 hover:text-white"
+                        className="text-amber-400 hover:text-amber-200"
                       >
                         <X className="h-5 w-5" />
                       </Button>
                     </div>
 
                     <div className="mb-4">
-                      <h4 className="text-sm uppercase tracking-wider text-gray-400 mb-1">Palavras-Chave</h4>
-                      <p className="text-white">{crystal.keywords}</p>
+                      <h4 className="text-sm uppercase tracking-wider text-amber-400 mb-1">Palavras-Chave</h4>
+                      <p className="text-amber-100">{crystal.keywords}</p>
                     </div>
 
                     <div>
-                      <h4 className="text-sm uppercase tracking-wider text-gray-400 mb-1">Perfil Místico</h4>
-                      <p className="text-white">{crystal.description}</p>
+                      <h4 className="text-sm uppercase tracking-wider text-amber-400 mb-1">Perfil Místico</h4>
+                      <p className="text-amber-100">{crystal.description}</p>
                     </div>
 
                     <div className="mt-6 flex justify-end">
                       <Button
-                        className="bg-gradient-to-r from-[#d4af37] to-[#ffd700] text-black hover:from-[#ffd700] hover:to-[#d4af37]"
+                        className="bg-gradient-to-r from-amber-600 to-amber-500 text-white hover:from-amber-500 hover:to-amber-400"
                         onClick={closeInfo}
                       >
                         Fechar
@@ -704,40 +359,6 @@ export default function SimplifiedCrystalCabinet() {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Estilo para animação de partículas */}
-      <style jsx global>{`
-        @keyframes float {
-          0% {
-            transform: translateY(0) translateX(0);
-          }
-          25% {
-            transform: translateY(-10px) translateX(5px);
-          }
-          50% {
-            transform: translateY(0) translateX(10px);
-          }
-          75% {
-            transform: translateY(10px) translateX(5px);
-          }
-          100% {
-            transform: translateY(0) translateX(0);
-          }
-        }
-        
-        .animate-pulse-slow {
-          animation: pulse 3s infinite;
-        }
-        
-        @keyframes pulse {
-          0%, 100% {
-            opacity: 0.2;
-          }
-          50% {
-            opacity: 0.5;
-          }
-        }
-      `}</style>
     </div>
   )
 }
