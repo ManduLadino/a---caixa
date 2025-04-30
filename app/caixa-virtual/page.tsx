@@ -1,40 +1,23 @@
-"use client"
+import MysticCrystalCabinet from "@/components/mystic-crystal-cabinet"
+import type { Metadata } from "next"
 
-import SimplifiedCrystalCabinet from "@/components/simplified-crystal-cabinet"
-import { ParticleBackground } from "@/components/ui/particle-background"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { ArrowLeft } from "lucide-react"
+export const metadata: Metadata = {
+  title: "A Caixa Mística | Armário de Cristais",
+  description: "Explore o armário místico de cristais e pedras energéticas para sua leitura espiritual personalizada.",
+}
 
 export default function CaixaVirtualPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#2d1b0e] to-[#3d2815] text-amber-100 py-12 px-4">
-      <ParticleBackground />
-
-      <div className="container mx-auto max-w-4xl">
-        <div className="mb-8">
-          <Link href="/">
-            <Button variant="ghost" className="text-amber-200 hover:bg-amber-900/30">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Voltar para A CAIXA
-            </Button>
-          </Link>
-        </div>
-
-        <h1 className="text-3xl md:text-4xl font-bold text-center mb-2 text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-amber-500">
-          A Caixa Mística
-        </h1>
-        <p className="text-center text-amber-200/80 mb-8">
-          Selecione as pedras para sua leitura do Estado de Consciência Interna
+    <main className="min-h-screen flex flex-col items-center p-4 pt-20 bg-gradient-radial from-[#1d002b] to-[#36005d] bg-fixed bg-cover text-[#e6e0ff] overflow-x-hidden">
+      <div className="w-full max-w-6xl mx-auto">
+        <h1 className="text-4xl font-bold text-center mb-8">Armário Místico de Cristais</h1>
+        <p className="text-center text-lg mb-8 max-w-3xl mx-auto">
+          Explore nosso armário místico contendo 33 pedras preciosas com propriedades energéticas únicas. Selecione até
+          5 pedras para sua leitura personalizada.
         </p>
 
-        <SimplifiedCrystalCabinet />
-
-        <div className="mt-12 text-center text-amber-200/60 text-sm">
-          <p className="mb-2">Selecione até 5 pedras conforme sua intuição e energia.</p>
-          <p>© 2023 A Caixa Mística - Todos os direitos reservados</p>
-        </div>
+        <MysticCrystalCabinet />
       </div>
-    </div>
+    </main>
   )
 }
