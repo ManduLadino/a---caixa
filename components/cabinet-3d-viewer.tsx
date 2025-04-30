@@ -1,57 +1,208 @@
 "use client"
 
-import { useState, useRef, useEffect, Suspense, useMemo } from "react"
-import { Canvas, useFrame, useThree } from "@react-three/fiber"
+import { useState, useRef, useEffect, useMemo, Suspense } from "react"
+import { useFrame, useThree } from "@react-three/fiber"
 import {
-  OrbitControls,
-  Environment,
   useGLTF,
   Html,
-  PerspectiveCamera,
   useTexture,
-  Bounds,
   useBounds,
   PointMaterial,
   Points,
   SpotLight,
   useDepthBuffer,
+  PerspectiveCamera,
 } from "@react-three/drei"
-import { motion, AnimatePresence } from "framer-motion"
+import { Canvas } from "@react-three/fiber"
+import { OrbitControls, Environment } from "@react-three/drei"
 import { Button } from "@/components/ui/button"
-import { Info, X, Sparkles, Volume2, RotateCcw, ZoomIn, ZoomOut } from "lucide-react"
+import { Info, RotateCcw, ZoomIn, ZoomOut, Sparkles, Volume2, X } from "lucide-react"
 import { stonePrompts } from "@/lib/stone-prompts"
 import * as THREE from "three"
 import Image from "next/image"
+import Link from "next/link"
+import { motion, AnimatePresence } from "framer-motion"
 
 // Definição das pedras com suas propriedades
 const stoneData = [
   // Primeira prateleira
-  { id: "labradorite", name: "Labradorite", color: "#3A7D7E", position: [0.7, 1.6, 0.2], shelf: 0 },
-  { id: "agree", name: "Agree", color: "#89CFF0", position: [0.35, 1.6, 0.2], shelf: 0 },
-  { id: "abalone", name: "Abalone", color: "#4F7942", position: [0, 1.6, 0.2], shelf: 0 },
-  { id: "abalone2", name: "Abalone", color: "#5F8575", position: [-0.35, 1.6, 0.2], shelf: 0 },
-  { id: "onyx", name: "Ônix", color: "#0D0D0D", position: [-0.7, 1.6, 0.2], shelf: 0 },
+  {
+    id: "labradorite",
+    name: "Labradorite",
+    color: "#3A7D7E",
+    position: [0.7, 1.6, 0.2],
+    shelf: 0,
+    image: "https://v0.blob.com/ER3jo.png",
+  },
+  {
+    id: "agree",
+    name: "Agree",
+    color: "#89CFF0",
+    position: [0.35, 1.6, 0.2],
+    shelf: 0,
+    image: "https://v0.blob.com/ZIymjhU15a.png",
+  },
+  {
+    id: "abalone",
+    name: "Abalone",
+    color: "#4F7942",
+    position: [0, 1.6, 0.2],
+    shelf: 0,
+    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/3%20-%20Musgo-YnZPcNjs1F3Gny8WDBI4b2duQW06uf.png",
+  },
+  {
+    id: "abalone2",
+    name: "Abalone",
+    color: "#5F8575",
+    position: [-0.35, 1.6, 0.2],
+    shelf: 0,
+    image:
+      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/5%20-%20Agata%20Rosa-ziIOvnAMEuQNOcgbmRtTq4xSP1qlLS.png",
+  },
+  {
+    id: "onyx",
+    name: "Ônix",
+    color: "#0D0D0D",
+    position: [-0.7, 1.6, 0.2],
+    shelf: 0,
+    image:
+      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/4%20-%20Agata%20Preta-uf7yymVfSSCOuOkrO1yGbQASWxhNdp.png",
+  },
 
   // Segunda prateleira
-  { id: "kyarite", name: "Kyarite", color: "#3A7D7E", position: [0.7, 1.1, 0.2], shelf: 1 },
-  { id: "amoityop", name: "Amoityop", color: "#9370DB", position: [0.35, 1.1, 0.2], shelf: 1 },
-  { id: "petrihual", name: "Petrihual", color: "#4F7942", position: [0, 1.1, 0.2], shelf: 1 },
-  { id: "arsieronite", name: "Arsieronite", color: "#5F8575", position: [-0.35, 1.1, 0.2], shelf: 1 },
-  { id: "moonstone", name: "Pedra da Lua", color: "#ADD8E6", position: [-0.7, 1.1, 0.2], shelf: 1 },
+  {
+    id: "kyarite",
+    name: "Kyarite",
+    color: "#3A7D7E",
+    position: [0.7, 1.1, 0.2],
+    shelf: 1,
+    image:
+      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/7%20-%20Agarta%20Marinha-nZBt2Tldg9412iVfvyO9XYC3M1pmy8.png",
+  },
+  {
+    id: "amoityop",
+    name: "Amoityop",
+    color: "#9370DB",
+    position: [0.35, 1.1, 0.2],
+    shelf: 1,
+    image:
+      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/9%20-%20amestitasta-ITBvQA2P8OfhfHKlGuzFYddnui9YLU.png",
+  },
+  {
+    id: "petrihual",
+    name: "Petrihual",
+    color: "#4F7942",
+    position: [0, 1.1, 0.2],
+    shelf: 1,
+    image:
+      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/6%20-%20agatq%20Rosa-9y8nVaSTeEEUkhm0mwTpxXsCIzvqTs.png",
+  },
+  {
+    id: "arsieronite",
+    name: "Arsieronite",
+    color: "#5F8575",
+    position: [-0.35, 1.1, 0.2],
+    shelf: 1,
+    image:
+      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/8%20-%20Cianita%20Azul-EGIcvmpNs1EjxpE3UxQITdOsfqviU9.png",
+  },
+  {
+    id: "moonstone",
+    name: "Pedra da Lua",
+    color: "#ADD8E6",
+    position: [-0.7, 1.1, 0.2],
+    shelf: 1,
+    image:
+      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/La%CC%81pis-Lazu%CC%81li%20-Qj0ks3iN4u8K57gQ5TGYwRIeBU1NaE.png",
+  },
 
   // Terceira prateleira
-  { id: "malachite2", name: "Malaquita", color: "#0000CD", position: [0.7, 0.6, 0.2], shelf: 2 },
-  { id: "cenerite", name: "Cenerite", color: "#40E0D0", position: [0.35, 0.6, 0.2], shelf: 2 },
-  { id: "fluorite", name: "Fluorita", color: "#00FF7F", position: [0, 0.6, 0.2], shelf: 2 },
-  { id: "aventurite", name: "Aventurita", color: "#2E8B57", position: [-0.35, 0.6, 0.2], shelf: 2 },
-  { id: "sodelite", name: "Sodelita", color: "#0000CD", position: [-0.7, 0.6, 0.2], shelf: 2 },
+  {
+    id: "malachite2",
+    name: "Malaquita",
+    color: "#0000CD",
+    position: [0.7, 0.6, 0.2],
+    shelf: 2,
+    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Malaquita-aH0Dp5UnU164btSGF0QlYcq19qQzZx.png",
+  },
+  {
+    id: "cenerite",
+    name: "Cenerite",
+    color: "#40E0D0",
+    position: [0.35, 0.6, 0.2],
+    shelf: 2,
+    image:
+      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/2%20-%20AGATA%20AZUL-DrseAymXrttQ7jomRs3eDBdjfKGLdC.png",
+  },
+  {
+    id: "fluorite",
+    name: "Fluorita",
+    color: "#00FF7F",
+    position: [0, 0.6, 0.2],
+    shelf: 2,
+    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Fluorita-QmiRFryN4orBjH3Ou2T94poFLNBvmv.png",
+  },
+  {
+    id: "aventurite",
+    name: "Aventurita",
+    color: "#2E8B57",
+    position: [-0.35, 0.6, 0.2],
+    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/3%20-%20Musgo-YnZPcNjs1F3Gny8WDBI4b2duQW06uf.png",
+  },
+  {
+    id: "sodelite",
+    name: "Sodelita",
+    color: "#0000CD",
+    position: [-0.7, 0.6, 0.2],
+    shelf: 2,
+    image:
+      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Howlita%20Branca-B3y6iYysLIgXNV5xLBVtgc3bYs977c.png",
+  },
 
   // Quarta prateleira
-  { id: "chrosepase", name: "Chrosepase", color: "#4F7942", position: [0.7, 0.1, 0.2], shelf: 3 },
-  { id: "angelite", name: "Angelita", color: "#ADD8E6", position: [0.35, 0.1, 0.2], shelf: 3 },
-  { id: "aquamarine", name: "Água Marinha", color: "#00BFFF", position: [0, 0.1, 0.2], shelf: 3 },
-  { id: "aquamarine2", name: "Água Marinha", color: "#2E8B57", position: [-0.35, 0.1, 0.2], shelf: 3 },
-  { id: "sodalite", name: "Sodalita", color: "#191970", position: [-0.7, 0.1, 0.2], shelf: 3 },
+  {
+    id: "chrosepase",
+    name: "Chrosepase",
+    color: "#4F7942",
+    position: [0.7, 0.1, 0.2],
+    shelf: 3,
+    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Granada-gXKK5etfNWjjiYcSpYcOCGUpw5fmrN.png",
+  },
+  {
+    id: "angelite",
+    name: "Angelita",
+    color: "#ADD8E6",
+    position: [0.35, 0.1, 0.2],
+    image:
+      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/7%20-%20Agarta%20Marinha-nZBt2Tldg9412iVfvyO9XYC3M1pmy8.png",
+  },
+  {
+    id: "aquamarine",
+    name: "Água Marinha",
+    color: "#00BFFF",
+    position: [0, 0.1, 0.2],
+    shelf: 3,
+    image:
+      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/8%20-%20Cianita%20Azul-EGIcvmpNs1EjxpE3UxQITdOsfqviU9.png",
+  },
+  {
+    id: "aquamarine2",
+    name: "Água Marinha",
+    color: "#2E8B57",
+    position: [-0.35, 0.1, 0.2],
+    shelf: 3,
+    image:
+      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/9%20-%20amestitasta-ITBvQA2P8OfhfHKlGuzFYddnui9YLU.png",
+  },
+  {
+    id: "sodalite",
+    name: "Sodalite",
+    color: "#191970",
+    position: [-0.7, 0.1, 0.2],
+    shelf: 3,
+    image:
+      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/La%CC%81pis-Lazu%CC%81li%20-Qj0ks3iN4u8K57gQ5TGYwRIeBU1NaE.png",
+  },
 ]
 
 // Componente para iluminação dinâmica
@@ -224,9 +375,9 @@ function StoneGlowEffect({ selectedStones }) {
 // Componente para o gabinete
 function Cabinet({ cabinetStyle, drawerOpen, toggleDrawer }) {
   const { nodes, materials } = useGLTF("/models/cabinet.glb") || { nodes: {}, materials: {} }
-  const woodTexture = useTexture("/textures/wood-texture.jpg")
-  const goldTexture = useTexture("/textures/gold-texture.jpg")
-  const glassTexture = useTexture("/textures/glass-texture.jpg")
+  const woodTexture = useTexture("/textures/wood-texture.png")
+  const goldTexture = useTexture("/textures/gold-texture.png")
+  const glassTexture = useTexture("/textures/glass-texture.png")
 
   // Configurar texturas
   woodTexture.wrapS = woodTexture.wrapT = THREE.RepeatWrapping
@@ -351,7 +502,7 @@ function Stone({ stone, isSelected, onClick, onInfoClick }) {
       } else {
         meshRef.current.scale.x = THREE.MathUtils.lerp(meshRef.current.scale.x, 1, 0.1)
         meshRef.current.scale.y = THREE.MathUtils.lerp(meshRef.current.scale.y, 1, 0.1)
-        meshRef.current.scale.z = THREE.MathUtils.lerp(meshRef.current.scale.z, 1, 0.1)
+        meshRef.current.scale.z = THREE.Math.Utils.lerp(meshRef.current.scale.z, 1, 0.1)
         meshRef.current.position.y = THREE.MathUtils.lerp(meshRef.current.position.y, stone.position[1], 0.1)
         meshRef.current.rotation.y = time * 0.2
       }
@@ -416,7 +567,6 @@ function Stone({ stone, isSelected, onClick, onInfoClick }) {
 
       {/* Pedra */}
       <mesh
-        ref={meshRef}
         castShadow
         receiveShadow
         onClick={onClick}
@@ -584,7 +734,6 @@ export default function Cabinet3DViewer() {
     if (selectedStones.includes(stoneId)) {
       setSelectedStones(selectedStones.filter((id) => id !== stoneId))
     } else {
-      // Removido o limite de 7 pedras
       setSelectedStones([...selectedStones, stoneId])
       playStoneSound()
     }
@@ -670,40 +819,29 @@ Que pergunta seu coração faz quando confrontado com o silêncio das pedras que
     }, 3000)
   }
 
-  // Controlar reprodução de áudio
-  const toggleAudio = () => {
-    if (!audioGenerated) return
-
-    if (isPlaying) {
-      window.speechSynthesis.pause()
-      if (audioRef.current) {
-        audioRef.current.pause()
-      }
-      setIsPlaying(false)
-    } else {
-      if (readingResult) {
-        const utterance = new SpeechSynthesisUtterance(readingResult)
-        utterance.lang = "pt-BR"
-        utterance.rate = 0.9
-        utterance.pitch = 1.1
-        window.speechSynthesis.speak(utterance)
-        setIsPlaying(true)
-      }
-    }
-  }
-
-  // Limpar seleção de pedras
   const clearSelection = () => {
     setSelectedStones([])
-    setReadingResult(null)
-    setShowReadingResult(false)
-    setAudioGenerated(false)
   }
 
-  // Resetar câmera
   const resetCamera = () => {
     if (controlsRef.current) {
       controlsRef.current.reset()
+    }
+  }
+
+  const toggleAudio = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause()
+      } else {
+        // Implementar lógica de texto para fala aqui
+        const text = readingResult || "Nenhuma leitura disponível."
+        const utterance = new SpeechSynthesisUtterance(text)
+        utterance.lang = "pt-BR"
+        speechSynthesis.speak(utterance)
+        audioRef.current.play()
+      }
+      setIsPlaying(!isPlaying)
     }
   }
 
@@ -711,24 +849,16 @@ Que pergunta seu coração faz quando confrontado com o silêncio das pedras que
     <div className="w-full max-w-4xl mx-auto">
       {/* Logo no topo esquerdo */}
       <div className="absolute top-4 left-4 z-10">
-        <Image
-          src="/images/a-caixa-official-logo.png"
-          alt="A CAIXA"
-          width={150}
-          height={150}
-          className="drop-shadow-lg"
-        />
+        <Link href="/">
+          <Button variant="outline" className="bg-white/5 border-white/20 hover:bg-white/10">
+            &lt; Voltar
+          </Button>
+        </Link>
       </div>
 
       {/* Controles superiores */}
       <div className="flex justify-between items-center mb-4">
-        <Button
-          onClick={toggleCabinetStyle}
-          variant="outline"
-          className="bg-white/10 border-amber-300/30 hover:bg-white/20"
-        >
-          {cabinetStyle === "wood" ? "Gabinete Dourado" : "Gabinete de Madeira"}
-        </Button>
+        <div></div>
 
         <div className="text-center">
           <h2 className="text-xl md:text-2xl font-bold text-amber-100">A CAIXA MÍSTICA 3D</h2>
