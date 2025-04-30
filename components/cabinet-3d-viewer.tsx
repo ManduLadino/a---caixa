@@ -487,10 +487,14 @@ function DrawerStones({ drawerOpen, selectedStones, toggleStoneSelection }) {
           const stone = stoneData.find((s) => s.id === stoneId)
           if (!stone) return null
 
-          const x = (index - (selectedStones.length - 1) / 2) * 0.2
+          // Organizar as pedras em linhas de 5
+          const row = Math.floor(index / 5)
+          const col = index % 5
+          const x = (col - 2) * 0.2
+          const z = row * 0.2
 
           return (
-            <group key={stoneId} position={[x, 0, 0]}>
+            <group key={stoneId} position={[x, 0, z]}>
               <mesh castShadow onClick={() => toggleStoneSelection(stoneId)}>
                 <sphereGeometry args={[0.08, 32, 32]} />
                 <meshStandardMaterial color={stone.color} />
@@ -580,12 +584,9 @@ export default function Cabinet3DViewer() {
     if (selectedStones.includes(stoneId)) {
       setSelectedStones(selectedStones.filter((id) => id !== stoneId))
     } else {
-      if (selectedStones.length < 7) {
-        setSelectedStones([...selectedStones, stoneId])
-        playStoneSound()
-      } else {
-        alert("Você já selecionou o número máximo de pedras (7).")
-      }
+      // Removido o limite de 7 pedras
+      setSelectedStones([...selectedStones, stoneId])
+      playStoneSound()
     }
   }
 
@@ -731,7 +732,7 @@ Que pergunta seu coração faz quando confrontado com o silêncio das pedras que
 
         <div className="text-center">
           <h2 className="text-xl md:text-2xl font-bold text-amber-100">A CAIXA MÍSTICA 3D</h2>
-          <p className="text-sm text-amber-200/70">Selecione até 7 pedras para sua leitura</p>
+          <p className="text-sm text-amber-200/70">Selecione quantas pedras desejar para sua leitura</p>
         </div>
 
         <Button
