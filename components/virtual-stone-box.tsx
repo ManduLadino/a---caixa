@@ -10,6 +10,9 @@ import { motion, AnimatePresence } from "framer-motion"
 import { stonePrompts } from "@/lib/stone-prompts"
 import { MandalaGenerator } from "@/components/mandala-generator"
 
+// Importe as funções de cache no topo do arquivo, junto com os outros imports
+import { generateAudioHash, findTranscriptionInCache, addTranscriptionToCache } from "@/lib/audio-cache"
+
 // Define os 33 tipos de pedras com suas cores e propriedades
 const stoneTypes = Object.keys(stonePrompts).map((key) => {
   const stone = stonePrompts[key]
@@ -138,6 +141,8 @@ export default function VirtualStoneBox() {
 
   const [speechRecognitionSetup, setSpeechRecognitionSetup] = useState(false)
   const [transcriptionInProgress, setTranscriptionInProgress] = useState(false)
+  // Adicione um novo estado para rastrear quando uma transcrição vem do cache
+  const [transcriptionFromCache, setTranscriptionFromCache] = useState(false)
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -423,11 +428,11 @@ export default function VirtualStoneBox() {
 
   // Iniciar gravação de áudio para a pergunta
   const startAudioRecording = useCallback(async () => {
+    const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition
     let recognitionInstance: any = null
 
     // Setup speech recognition if available and not already setup
     if (speechRecognitionAvailable && !speechRecognitionSetup) {
-      const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition
       recognitionInstance = new SpeechRecognition()
       recognitionInstance.lang = "pt-BR"
       recognitionInstance.continuous = false
@@ -476,6 +481,9 @@ export default function VirtualStoneBox() {
         }
       }
 
+      // Modifique a função mediaRecorder.onstop no método startAudioRecording
+      // Substitua o trecho que processa o áudio pelo seguinte:
+
       mediaRecorder.onstop = async () => {
         try {
           const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" })
@@ -498,25 +506,63 @@ export default function VirtualStoneBox() {
 
           try {
             setTranscriptionInProgress(true)
-            // Tenta usar a API de transcrição
-            const formData = new FormData()
-            formData.append("audio", audioBlob, "question.webm")
 
-            const response = await fetch("/api/transcribe-audio", {
-              method: "POST",
-              body: formData,
-            })
+            // Gera um hash do áudio para verificar no cache
+            const audioHash = await generateAudioHash(audioBlob)
 
-            const data = await response.json()
+            // Verifica se já existe uma transcrição no cache
+            const cachedTranscription = findTranscriptionInCache(audioHash)
 
-            if (data.text) {
-              setTranscribedText(data.text)
-              setAudioQuestion(data.text)
-              setQuestion(data.text)
+            if (cachedTranscription) {
+              console.log("Usando transcrição em cache")
+              setTranscribedText(cachedTranscription)
+              setAudioQuestion(cachedTranscription)
+              setQuestion(cachedTranscription)
               setSpeechRecognitionError(null)
+              setTranscriptionFromCache(true) // Indica que veio do cache
             } else {
-              // Se não houver texto, tenta usar o reconhecimento de voz do navegador
-              useSpeechRecognition()
+              // Quando não usar o cache, defina como false
+              setTranscriptionFromCache(false)
+
+              // Se não estiver em cache, faz a chamada à API
+              console.log("Transcrição não encontrada em cache, chamando API")
+
+              // Tenta usar a API de transcrição
+              const formData = new FormData()
+              formData.append("audio", audioBlob, "question.webm")
+
+              const response = await fetch("/api/transcribe-audio", {
+                method: "POST",
+                body: formData,
+              })
+
+              // Verifica se a resposta é válida antes de tentar fazer o parse
+              if (!response.ok) {
+                throw new Error(`Erro na API: ${response.status} ${response.statusText}`)
+              }
+
+              // Tenta fazer o parse do JSON com tratamento de erro
+              let data
+              try {
+                const text = await response.text()
+                data = JSON.parse(text)
+              } catch (parseError) {
+                console.error("Erro ao analisar resposta JSON:", parseError)
+                throw new Error("Formato de resposta inválido")
+              }
+
+              if (data && data.text) {
+                // Adiciona a transcrição ao cache
+                addTranscriptionToCache(audioHash, data.text)
+
+                setTranscribedText(data.text)
+                setAudioQuestion(data.text)
+                setQuestion(data.text)
+                setSpeechRecognitionError(null)
+              } else {
+                // Se não houver texto, tenta usar o reconhecimento de voz do navegador
+                useSpeechRecognition()
+              }
             }
           } catch (error) {
             console.error("Erro ao transcrever áudio:", error)
@@ -1015,7 +1061,12 @@ export default function VirtualStoneBox() {
         </div>
         {transcribedText && (
           <div className="mt-2 p-2 bg-white/5 rounded-md text-sm">
-            <p className="text-gray-300">Pergunta transcrita:</p>
+            <div className="flex justify-between items-center">
+              <p className="text-gray-300">Pergunta transcrita:</p>
+              {transcriptionFromCache && (
+                <span className="text-xs px-2 py-0.5 bg-green-500/20 text-green-300 rounded-full">cache</span>
+              )}
+            </div>
             <p className="text-white">{transcribedText}</p>
           </div>
         )}
