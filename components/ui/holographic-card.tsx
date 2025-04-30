@@ -2,26 +2,27 @@
 
 import type React from "react"
 
+// Atualizando o componente HolographicCard para o novo tema
+import { motion } from "framer-motion"
 import { useState, useRef, useEffect } from "react"
-import { cn } from "@/lib/utils"
-import { Card } from "@/components/ui/card"
+import type { ReactNode } from "react"
 
 interface HolographicCardProps {
-  children: React.ReactNode
+  children: ReactNode
   className?: string
-  intensity?: number
   delay?: number
+  id?: string
 }
 
-export function HolographicCard({ children, className, intensity = 20, delay = 0 }: HolographicCardProps) {
+export function HolographicCard({ children, className = "", delay = 0, id }: HolographicCardProps) {
   const [rotateX, setRotateX] = useState(0)
   const [rotateY, setRotateY] = useState(0)
-  const [isVisible, setIsVisible] = useState(false)
+  const [loaded, setLoaded] = useState(false)
   const cardRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setIsVisible(true)
+      setLoaded(true)
     }, delay)
 
     return () => clearTimeout(timer)
@@ -36,8 +37,8 @@ export function HolographicCard({ children, className, intensity = 20, delay = 0
     const centerX = rect.width / 2
     const centerY = rect.height / 2
 
-    const rotateXValue = ((y - centerY) / centerY) * intensity * -1
-    const rotateYValue = ((x - centerX) / centerX) * intensity
+    const rotateXValue = ((y - centerY) / centerY) * 5
+    const rotateYValue = ((centerX - x) / centerX) * 5
 
     setRotateX(rotateXValue)
     setRotateY(rotateYValue)
@@ -49,36 +50,33 @@ export function HolographicCard({ children, className, intensity = 20, delay = 0
   }
 
   return (
-    <div
+    <motion.div
+      id={id}
       ref={cardRef}
-      className={cn(
-        "perspective-1000 transition-all duration-700 ease-out",
-        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8",
-        className,
-      )}
-      style={{ perspective: "1000px" }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: loaded ? 1 : 0, y: loaded ? 0 : 20 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className={`relative overflow-hidden rounded-lg p-6 ${className}`}
+      style={{
+        transformStyle: "preserve-3d",
+        transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
+        transition: "transform 0.1s ease-out",
+        backgroundImage: "url('/images/parchment-texture.png')",
+        backgroundSize: "cover",
+        boxShadow: "0 10px 30px rgba(0, 0, 0, 0.2), inset 0 0 15px rgba(255, 255, 255, 0.1)",
+        border: "1px solid rgba(212, 163, 115, 0.3)",
+      }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
-      <Card
-        className={cn(
-          "bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-md shadow-glow transition-transform duration-200 ease-out",
-          className,
-        )}
+      <div className="relative z-10">{children}</div>
+      <div
+        className="absolute inset-0 opacity-20 pointer-events-none"
         style={{
-          transform: `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
-          backgroundImage: `
-            radial-gradient(
-              circle at ${50 + (rotateY / intensity) * 50}% ${50 + (rotateX / intensity) * 50}%, 
-              rgba(255, 255, 255, 0.1) 0%, 
-              rgba(255, 255, 255, 0.05) 25%, 
-              rgba(255, 255, 255, 0) 50%
-            )
-          `,
+          background: `radial-gradient(circle at ${50 + rotateY * 2}% ${50 + rotateX * 2}%, rgba(212, 163, 115, 0.8), transparent 70%)`,
+          transition: "background 0.1s ease-out",
         }}
-      >
-        {children}
-      </Card>
-    </div>
+      />
+    </motion.div>
   )
 }

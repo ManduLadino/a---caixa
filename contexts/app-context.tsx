@@ -25,7 +25,7 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined)
 
-export function AppProvider({ children }: { children: React.ReactNode }) {
+export function AppContextProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>("dark")
   const [readings, setReadings] = useState<Reading[]>([])
   const [subscriptionTier, setSubscriptionTier] = useState<SubscriptionTier>("free")

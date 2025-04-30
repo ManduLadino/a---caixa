@@ -1,37 +1,20 @@
-"use client"
-
-import type React from "react"
-
-import { useState, useEffect } from "react"
-import { cn } from "@/lib/utils"
+// Atualizando o componente GlowText para o novo tema
+import type { ReactNode } from "react"
 
 interface GlowTextProps {
-  children: React.ReactNode
-  className?: string
+  children: ReactNode
   glowColor?: string
-  delay?: number
+  className?: string
 }
 
-export function GlowText({ children, className, glowColor = "#c774f0", delay = 0 }: GlowTextProps) {
-  const [isVisible, setIsVisible] = useState(false)
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsVisible(true)
-    }, delay)
-
-    return () => clearTimeout(timer)
-  }, [delay])
-
+export function GlowText({ children, glowColor = "#d4a373", className = "" }: GlowTextProps) {
   return (
     <span
-      className={cn(
-        "transition-all duration-1000 ease-in-out",
-        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
-        className,
-      )}
+      className={`relative inline-block ${className}`}
       style={{
-        textShadow: `0 0 10px ${glowColor}, 0 0 20px ${glowColor}`,
+        textShadow: `0 0 10px ${glowColor}, 0 0 20px ${glowColor}80, 0 0 30px ${glowColor}40`,
+        color: "#faedcd",
+        fontFamily: "var(--font-cinzel)",
       }}
     >
       {children}

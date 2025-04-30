@@ -1,41 +1,29 @@
 import type React from "react"
 import "./globals.css"
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
+import { Inter, Cinzel } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
-import { AppProvider } from "@/contexts/app-context"
-import MobileRedirect from "@/components/mobile-redirect"
-import Footer from "@/components/footer"
+import { AppContextProvider } from "@/contexts/app-context"
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
+const cinzel = Cinzel({ subsets: ["latin"], variable: "--font-cinzel", weight: ["400", "500", "600", "700"] })
 
 export const metadata: Metadata = {
-  title: "A CAIXA – Oráculo Digital com IA",
-  description: "Um oráculo digital que une misticismo ancestral à inteligência artificial",
-  manifest: "/manifest.json",
+  title: "Cartomente - A CAIXA",
+  description: "Descubra os mistérios do seu destino através das pedras místicas e da sabedoria ancestral",
     generator: 'v0.dev'
 }
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode
-}) {
+}>) {
   return (
-    <html lang="pt-BR">
-      <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
-      </head>
-      <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
-          <AppProvider>
-            <MobileRedirect />
-            <div className="flex flex-col min-h-screen">
-              <main className="flex-grow">{children}</main>
-              <Footer />
-            </div>
-          </AppProvider>
+    <html lang="pt-BR" suppressHydrationWarning>
+      <body className={`${inter.variable} ${cinzel.variable} font-sans`}>
+        <ThemeProvider attribute="class" defaultTheme="dark">
+          <AppContextProvider>{children}</AppContextProvider>
         </ThemeProvider>
       </body>
     </html>
