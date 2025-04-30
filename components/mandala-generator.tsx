@@ -8,6 +8,8 @@ interface MandalaParams {
   shape: string
   complexity: number
   symbols: string[]
+  rotationSpeed?: number
+  highQuality?: boolean
 }
 
 interface MandalaGeneratorProps {
@@ -73,6 +75,22 @@ export function MandalaGenerator({
         ctx.moveTo(0, 0)
         ctx.quadraticCurveTo(radius * 0.5, radius * 0.5, radius, 0)
         ctx.quadraticCurveTo(radius * 0.5, -radius * 0.5, 0, 0)
+        break
+      case "star":
+        // Draw a star-like shape
+        ctx.moveTo(0, 0)
+        ctx.lineTo(radius * 0.3, radius * 0.1)
+        ctx.lineTo(radius, 0)
+        ctx.lineTo(radius * 0.3, -radius * 0.1)
+        ctx.lineTo(radius * 0.5, -radius * 0.5)
+        ctx.lineTo(0, -radius * 0.2)
+        ctx.lineTo(-radius * 0.5, -radius * 0.5)
+        ctx.lineTo(-radius * 0.3, -radius * 0.1)
+        ctx.lineTo(-radius, 0)
+        ctx.lineTo(-radius * 0.3, radius * 0.1)
+        ctx.lineTo(-radius * 0.5, radius * 0.5)
+        ctx.lineTo(0, radius * 0.2)
+        ctx.lineTo(radius * 0.5, radius * 0.5)
         break
       default: // circle or default
         ctx.arc(radius / 2, 0, radius / 4, 0, Math.PI * 2)
@@ -209,6 +227,40 @@ export function MandalaGenerator({
         ctx.fill()
         break
 
+      case "triângulo":
+      case "triangulo":
+      case "triangle":
+        // Draw a triangle
+        ctx.beginPath()
+        ctx.moveTo(0, -size)
+        ctx.lineTo(size * 0.866, size * 0.5)
+        ctx.lineTo(-size * 0.866, size * 0.5)
+        ctx.closePath()
+        ctx.fill()
+        break
+
+      case "hexágono":
+      case "hexagono":
+      case "hexagon":
+        // Draw a hexagon
+        ctx.beginPath()
+        for (let i = 0; i < 6; i++) {
+          const angle = (Math.PI / 3) * i
+          ctx.lineTo(Math.cos(angle) * size, Math.sin(angle) * size)
+        }
+        ctx.closePath()
+        ctx.fill()
+        break
+
+      case "círculo":
+      case "circulo":
+      case "circle":
+        // Draw a circle
+        ctx.beginPath()
+        ctx.arc(0, 0, size, 0, Math.PI * 2)
+        ctx.fill()
+        break
+
       default:
         // Draw a circle as default
         ctx.beginPath()
@@ -245,7 +297,7 @@ export function MandalaGenerator({
 
   // Animation loop
   const startAnimation = () => {
-    setRotation((prev) => (prev + 0.1) % 360)
+    setRotation((prev) => (prev + (params.rotationSpeed || 0.1)) % 360)
     animationRef.current = requestAnimationFrame(startAnimation)
   }
 
@@ -260,7 +312,7 @@ export function MandalaGenerator({
         cancelAnimationFrame(animationRef.current)
       }
     }
-  }, [animate])
+  }, [animate, params.rotationSpeed])
 
   // Draw the mandala
   useEffect(() => {

@@ -5,10 +5,24 @@ import type React from "react"
 import { useState, useRef, useEffect, useCallback } from "react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { Sparkles, Wand2, Camera, Volume2, Download, Mic, MicOff, X } from "lucide-react"
+import { Sparkles, Wand2, Camera, Volume2, Download, Mic, MicOff, X, Smartphone } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { stonePrompts } from "@/lib/stone-prompts"
 import { MandalaGenerator } from "@/components/mandala-generator"
+import dynamic from "next/dynamic"
+
+// Importação dinâmica do componente de realidade aumentada
+const AugmentedRealityViewer = dynamic(() => import("@/components/augmented-reality-viewer"), {
+  ssr: false,
+  loading: () => (
+    <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-16 h-16 border-4 border-[#8e2de2] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <p className="text-white text-lg">Carregando experiência de realidade aumentada...</p>
+      </div>
+    </div>
+  ),
+})
 
 // Definição das 33 pedras com dados mais detalhados
 const stoneTypes = Object.keys(stonePrompts).map((key) => {
@@ -151,6 +165,8 @@ export default function EnhancedStoneBox() {
   const [ambientLight, setAmbientLight] = useState(0.5) // Intensidade da luz ambiente (0-1)
   const [showAllStones, setShowAllStones] = useState(false) // Para mostrar todas as 33 pedras
   const [isSpeechEnabled, setIsSpeechEnabled] = useState(false)
+  const [showARViewer, setShowARViewer] = useState(false) // Estado para controlar a exibição do visualizador AR
+  const [isRecognitionSetup, setIsRecognitionSetup] = useState(false)
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -1099,6 +1115,16 @@ export default function EnhancedStoneBox() {
     }
   }
 
+  // Abrir o visualizador de realidade aumentada
+  const openARViewer = () => {
+    setShowARViewer(true)
+  }
+
+  // Fechar o visualizador de realidade aumentada
+  const closeARViewer = () => {
+    setShowARViewer(false)
+  }
+
   return (
     <div className="flex flex-col items-center w-full max-w-3xl">
       <div className="flex flex-wrap justify-center gap-2 mb-4">
@@ -1450,6 +1476,12 @@ export default function EnhancedStoneBox() {
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button onClick={openARViewer} className="bg-[#ff9be2] hover:bg-[#ff70d8] text-white" disabled={isScanning}>
+              <Smartphone className="w-4 h-4 mr-2" /> Ver em Realidade Aumentada
+            </Button>
+          </motion.div>
+
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Button
               onClick={toggleRealisticMode}
               variant="outline"
@@ -1532,6 +1564,9 @@ export default function EnhancedStoneBox() {
       {/* Elementos ocultos para áudio e vídeo */}
       <audio ref={audioRef} className="hidden" />
       <video ref={videoRef} className="hidden" controls />
+
+      {/* Visualizador de Realidade Aumentada */}
+      {showARViewer && <AugmentedRealityViewer onClose={closeARViewer} />}
     </div>
   )
 }

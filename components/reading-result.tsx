@@ -6,6 +6,8 @@ import { HolographicCard } from "@/components/ui/holographic-card"
 import { MandalaGenerator } from "@/components/mandala-generator"
 import { Play, Pause, Download, Share2 } from "lucide-react"
 import { motion } from "framer-motion"
+// Adicione o import do MandalaCustomizer
+import MandalaCustomizer from "@/components/mandala-customizer"
 
 interface ReadingResultProps {
   reading: string
@@ -20,6 +22,9 @@ export default function ReadingResult({ reading, mandalaParams, onClose }: Readi
   const [sections, setSections] = useState<string[]>([])
   const [currentSection, setCurrentSection] = useState(0)
   const [audioReady, setAudioReady] = useState(false)
+  // Adicione estes estados ao componente ReadingResult
+  const [showCustomizer, setShowCustomizer] = useState(false)
+  const [customMandalaParams, setCustomMandalaParams] = useState(mandalaParams)
 
   // Divide a leitura em seções
   useEffect(() => {
@@ -204,6 +209,22 @@ export default function ReadingResult({ reading, mandalaParams, onClose }: Readi
     }
   }
 
+  // Adicione esta função para atualizar os parâmetros da mandala
+  const updateMandalaParams = (newParams: any) => {
+    setCustomMandalaParams(newParams)
+  }
+
+  // Adicione esta função para salvar a mandala como imagem
+  const saveMandalaAsImage = () => {
+    const canvas = document.querySelector("canvas")
+    if (canvas) {
+      const link = document.createElement("a")
+      link.download = "minha-mandala.png"
+      link.href = canvas.toDataURL("image/png")
+      link.click()
+    }
+  }
+
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto">
       <motion.div
@@ -229,16 +250,27 @@ export default function ReadingResult({ reading, mandalaParams, onClose }: Readi
             {/* Mandala */}
             <div className="flex-shrink-0 flex flex-col items-center">
               <div className="relative w-64 h-64 mb-4">
-                <div className="absolute inset-0 rounded-full animate-spin-slow" style={{ animationDuration: "120s" }}>
+                <div
+                  className="absolute inset-0 rounded-full animate-spin-slow"
+                  style={{ animationDuration: `${120 / (customMandalaParams.rotationSpeed || 1)}s` }}
+                >
                   <MandalaGenerator
-                    params={mandalaParams}
+                    params={customMandalaParams}
                     size={256}
                     className="rounded-full"
                     animate={true}
-                    highQuality={true}
+                    highQuality={customMandalaParams.highQuality || false}
                   />
                 </div>
               </div>
+
+              {/* Botão para mostrar/ocultar o personalizador */}
+              <Button
+                onClick={() => setShowCustomizer(!showCustomizer)}
+                className="mb-4 bg-[#6a1fc7] hover:bg-[#8e2de2] text-white"
+              >
+                {showCustomizer ? "Ocultar Personalizador" : "Personalizar Mandala"}
+              </Button>
 
               {/* Controles de áudio */}
               <div className="flex flex-col items-center mt-4">
@@ -306,6 +338,17 @@ export default function ReadingResult({ reading, mandalaParams, onClose }: Readi
             </div>
           </div>
 
+          {/* Personalizador de Mandala */}
+          {showCustomizer && (
+            <div className="mt-6 mb-4">
+              <MandalaCustomizer
+                initialParams={mandalaParams}
+                onParamsChange={updateMandalaParams}
+                onSave={saveMandalaAsImage}
+              />
+            </div>
+          )}
+
           {/* Botões de ação */}
           <div className="flex justify-center gap-4 mt-8">
             <Button
@@ -313,6 +356,12 @@ export default function ReadingResult({ reading, mandalaParams, onClose }: Readi
               className="bg-[#6a1fc7] hover:bg-[#8e2de2] text-white px-6 py-2 rounded-full"
             >
               <Share2 className="w-4 h-4 mr-2" /> Compartilhar
+            </Button>
+            <Button
+              onClick={saveMandalaAsImage}
+              className="bg-[#8e2de2] hover:bg-[#a100f5] text-white px-6 py-2 rounded-full"
+            >
+              <Download className="w-4 h-4 mr-2" /> Salvar Mandala
             </Button>
             <Button
               onClick={() => {

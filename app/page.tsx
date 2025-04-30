@@ -1,279 +1,166 @@
 "use client"
-
-import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { GlowText } from "@/components/ui/glow-text"
-import { HolographicCard } from "@/components/ui/holographic-card"
-import Navbar from "@/components/navbar"
-import Link from "next/link"
-import { Sparkles, BookOpen, Compass, History } from "lucide-react"
+import { Sparkles, BookOpen } from "lucide-react"
+import Image from "next/image"
 
-export default function Home() {
-  const [loaded, setLoaded] = useState(false)
-
-  useEffect(() => {
-    setLoaded(true)
-  }, [])
-
+export default function HomePage() {
   return (
-    <main className="min-h-screen pt-20 pb-10 wood-texture">
-      <Navbar />
+    <main className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
+      {/* Hero Section */}
+      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+        {/* Background effect */}
+        <div className="absolute inset-0 bg-[url('/images/cosmos-bg.jpg')] bg-cover bg-center opacity-20"></div>
+        <div className="absolute inset-0 bg-gradient-radial from-transparent to-gray-900"></div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-16"
-        >
-          <div className="relative inline-block">
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.3, duration: 0.8 }}
-              className="absolute -top-16 -left-16 -right-16 -bottom-16 bg-cartomente-gold rounded-full filter blur-3xl opacity-10 animate-pulse-slow"
-            />
-            <h1 className="font-cinzel text-6xl font-bold mb-4 relative">
-              <GlowText glowColor="#d4af37">CARTOMENTE</GlowText>
-            </h1>
-          </div>
-          <p className="text-cartomente-cream text-xl max-w-3xl mx-auto">
-            Descubra os mistérios do seu destino através das cartas místicas e da sabedoria ancestral
-          </p>
-        </motion.div>
+        {/* Floating particles */}
+        <div className="absolute inset-0 pointer-events-none">
+          {Array.from({ length: 20 }).map((_, i) => (
+            <div
+              key={i}
+              className="absolute rounded-full bg-white/20 animate-float"
+              style={{
+                width: `${Math.random() * 10 + 2}px`,
+                height: `${Math.random() * 10 + 2}px`,
+                top: `${Math.random() * 100}%`,
+                left: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 5}s`,
+                animationDuration: `${Math.random() * 10 + 10}s`,
+              }}
+            ></div>
+          ))}
+        </div>
 
-        {/* Seção de destaque */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16 items-center">
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2, duration: 0.8 }}
-          >
-            <h2 className="font-cinzel text-3xl font-bold mb-4 text-cartomente-gold">O Oráculo Digital</h2>
-            <p className="text-cartomente-cream mb-6 text-lg">
-              Cartomente combina a sabedoria ancestral do tarô com inteligência artificial avançada para revelar
-              insights profundos sobre seu caminho e destino.
-            </p>
-            <p className="text-cartomente-cream mb-6">
-              Nosso oráculo digital interpreta as cartas místicas com precisão e profundidade, oferecendo orientação
-              personalizada para suas questões mais importantes.
-            </p>
-            <Link href="/oraculo">
-              <Button className="bg-cartomente-brown hover:bg-cartomente-brown-dark text-cartomente-cream">
-                <Compass className="mr-2 h-4 w-4" /> Consultar o Oráculo
-              </Button>
-            </Link>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4, duration: 0.8 }}
-            className="relative h-80 md:h-96"
-          >
-            <div className="absolute inset-0 flex justify-center">
-              <div className="relative w-48 h-80 perspective-1000">
-                <motion.div
-                  animate={{ rotateY: [0, 180, 360], rotateX: [5, -5, 5] }}
-                  transition={{
-                    duration: 20,
-                    ease: "linear",
-                    repeat: Number.POSITIVE_INFINITY,
-                    duration: 20,
-                    ease: "linear",
-                    repeat: Number.POSITIVE_INFINITY,
-                  }}
-                  className="absolute w-full h-full transform-style-3d"
-                >
-                  <div className="absolute w-full h-full tarot-card card-back" />
-                </motion.div>
-              </div>
-
-              <div className="absolute -bottom-10 -right-10 w-48 h-80 perspective-1000">
-                <motion.div
-                  animate={{ rotateY: [10, 190, 370], rotateX: [-5, 5, -5] }}
-                  transition={{
-                    duration: 25,
-                    ease: "linear",
-                    repeat: Number.POSITIVE_INFINITY,
-                    delay: 2,
-                  }}
-                  className="absolute w-full h-full transform-style-3d"
-                >
-                  <div className="absolute w-full h-full tarot-card card-back" />
-                </motion.div>
-              </div>
-
-              <div className="absolute -top-10 -left-10 w-48 h-80 perspective-1000">
-                <motion.div
-                  animate={{ rotateY: [20, 200, 380], rotateX: [8, -2, 8] }}
-                  transition={{
-                    duration: 22,
-                    ease: "linear",
-                    repeat: Number.POSITIVE_INFINITY,
-                    delay: 1,
-                  }}
-                  className="absolute w-full h-full transform-style-3d"
-                >
-                  <div className="absolute w-full h-full tarot-card card-back" />
-                </motion.div>
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-12">
+            <div className="md:w-1/2 text-center md:text-left">
+              <h1 className="text-4xl md:text-6xl font-bold mb-6">
+                <GlowText glowColor="#c774f0">A CAIXA</GlowText>
+              </h1>
+              <p className="text-xl md:text-2xl text-gray-300 mb-8">
+                Descubra os mistérios do seu Estado de Consciência Interna através das pedras místicas e da sabedoria
+                ancestral
+              </p>
+              <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+                <Link href="/gabinete-mistico">
+                  <Button
+                    size="lg"
+                    className="bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-700 hover:to-amber-600"
+                  >
+                    <Sparkles className="mr-2 h-5 w-5" />
+                    Gabinete Místico
+                  </Button>
+                </Link>
+                <Link href="/caixa-virtual">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="border-purple-500 text-purple-300 hover:bg-purple-950/30"
+                  >
+                    <BookOpen className="mr-2 h-5 w-5" />
+                    Caixa Virtual
+                  </Button>
+                </Link>
               </div>
             </div>
-          </motion.div>
-        </div>
 
-        {/* Seção de recursos */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6, duration: 0.5 }}
-            whileHover={{ y: -5 }}
-            className="card-hover"
-          >
-            <HolographicCard className="h-full">
-              <div className="text-center">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-cartomente-brown flex items-center justify-center">
-                  <Compass className="h-8 w-8 text-cartomente-cream" />
-                </div>
-                <h3 className="font-cinzel text-xl font-bold mb-2 text-cartomente-gold">Consulta ao Oráculo</h3>
-                <p className="text-cartomente-cream mb-4">
-                  Receba orientação personalizada através das cartas místicas interpretadas com precisão pela nossa IA.
-                </p>
-                <Link href="/oraculo">
-                  <Button variant="outline">Consultar Agora</Button>
-                </Link>
+            <div className="md:w-1/2 relative">
+              <div className="relative w-full aspect-square max-w-lg mx-auto">
+                <Image
+                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-K3tqDHeN01mLPOZcPSk4idKY4mPCul.png"
+                  alt="Gabinete de pedras místicas"
+                  width={500}
+                  height={500}
+                  className="object-contain"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent bottom-0 h-1/4"></div>
               </div>
-            </HolographicCard>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7, duration: 0.5 }}
-            whileHover={{ y: -5 }}
-            className="card-hover"
-          >
-            <HolographicCard className="h-full">
-              <div className="text-center">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-cartomente-brown flex items-center justify-center">
-                  <BookOpen className="h-8 w-8 text-cartomente-cream" />
-                </div>
-                <h3 className="font-cinzel text-xl font-bold mb-2 text-cartomente-gold">Biblioteca Mística</h3>
-                <p className="text-cartomente-cream mb-4">
-                  Explore nossa vasta coleção de conhecimentos sobre tarô, símbolos místicos e interpretações.
-                </p>
-                <Link href="/biblioteca">
-                  <Button variant="outline">Explorar</Button>
-                </Link>
-              </div>
-            </HolographicCard>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8, duration: 0.5 }}
-            whileHover={{ y: -5 }}
-            className="card-hover"
-          >
-            <HolographicCard className="h-full">
-              <div className="text-center">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-cartomente-brown flex items-center justify-center">
-                  <History className="h-8 w-8 text-cartomente-cream" />
-                </div>
-                <h3 className="font-cinzel text-xl font-bold mb-2 text-cartomente-gold">Histórico de Leituras</h3>
-                <p className="text-cartomente-cream mb-4">
-                  Acesse suas consultas anteriores e acompanhe como as previsões se manifestam em sua jornada.
-                </p>
-                <Link href="/historico">
-                  <Button variant="outline">Ver Histórico</Button>
-                </Link>
-              </div>
-            </HolographicCard>
-          </motion.div>
-        </div>
-
-        {/* Seção de depoimentos */}
-        <div className="mb-16">
-          <h2 className="font-cinzel text-3xl font-bold mb-8 text-center text-cartomente-gold">
-            O Que Dizem Nossos Consulentes
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.9, duration: 0.5 }}
-            >
-              <HolographicCard>
-                <div className="flex flex-col h-full">
-                  <p className="text-cartomente-cream mb-4 italic">
-                    "A consulta ao Cartomente foi reveladora. As cartas captaram exatamente o momento que estou vivendo
-                    e ofereceram orientação valiosa para minhas decisões."
-                  </p>
-                  <div className="mt-auto flex items-center">
-                    <div className="w-10 h-10 rounded-full bg-cartomente-brown mr-3 flex items-center justify-center">
-                      <span className="text-cartomente-cream font-bold">M</span>
-                    </div>
-                    <div>
-                      <p className="text-cartomente-gold font-bold">Maria C.</p>
-                      <p className="text-cartomente-cream text-sm">São Paulo, SP</p>
-                    </div>
-                  </div>
-                </div>
-              </HolographicCard>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 1, duration: 0.5 }}
-            >
-              <HolographicCard>
-                <div className="flex flex-col h-full">
-                  <p className="text-cartomente-cream mb-4 italic">
-                    "Impressionante como as cartas e a interpretação foram precisas. Recebi insights que me ajudaram a
-                    tomar decisões importantes em um momento de incerteza."
-                  </p>
-                  <div className="mt-auto flex items-center">
-                    <div className="w-10 h-10 rounded-full bg-cartomente-brown mr-3 flex items-center justify-center">
-                      <span className="text-cartomente-cream font-bold">R</span>
-                    </div>
-                    <div>
-                      <p className="text-cartomente-gold font-bold">Ricardo T.</p>
-                      <p className="text-cartomente-cream text-sm">Rio de Janeiro, RJ</p>
-                    </div>
-                  </div>
-                </div>
-              </HolographicCard>
-            </motion.div>
+            </div>
           </div>
         </div>
+      </section>
 
-        {/* Call to action */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.1, duration: 0.5 }}
-          className="text-center"
-        >
-          <HolographicCard className="max-w-3xl mx-auto">
-            <h2 className="font-cinzel text-2xl font-bold mb-4 text-cartomente-gold">
-              Descubra o Que as Cartas Reservam Para Você
-            </h2>
-            <p className="text-cartomente-cream mb-6">
-              Inicie sua jornada de autoconhecimento e descubra insights valiosos sobre seu passado, presente e futuro.
-            </p>
-            <Link href="/oraculo">
-              <Button className="bg-cartomente-brown hover:bg-cartomente-brown-dark text-cartomente-cream">
-                <Sparkles className="mr-2 h-4 w-4" /> Consultar o Oráculo Agora
+      {/* Features Section */}
+      <section className="py-20 bg-gray-900/80">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+            <GlowText glowColor="#9f7aea">Descubra Sua Jornada Interior</GlowText>
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <FeatureCard
+              title="Pedras Místicas"
+              description="Explore nossa coleção de cristais energéticos cuidadosamente selecionados para guiar sua jornada espiritual."
+              icon="✨"
+            />
+            <FeatureCard
+              title="Leituras Personalizadas"
+              description="Receba interpretações únicas baseadas na disposição das pedras místicas em A CAIXA."
+              icon="🔮"
+            />
+            <FeatureCard
+              title="Expansão da Consciência"
+              description="Descubra caminhos para expandir seu Estado de Consciência Interna através de orientações espirituais."
+              icon="🌌"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Call to Action */}
+      <section className="py-20 bg-gradient-to-b from-gray-900 to-purple-900/30">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">
+            <GlowText glowColor="#c774f0">Inicie Sua Jornada Agora</GlowText>
+          </h2>
+          <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+            Abra A CAIXA e permita que as pedras místicas revelem os segredos do seu Estado de Consciência Interna.
+          </p>
+          <div className="flex flex-wrap gap-4 justify-center">
+            <Link href="/gabinete-mistico">
+              <Button
+                size="lg"
+                className="bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-700 hover:to-amber-600"
+              >
+                <Sparkles className="mr-2 h-5 w-5" />
+                Gabinete Luxuoso
               </Button>
             </Link>
-          </HolographicCard>
-        </motion.div>
-      </div>
+            <Link href="/caixa-virtual">
+              <Button
+                size="lg"
+                className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+              >
+                Caixa Virtual
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Custom styles */}
+      <style jsx global>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0) translateX(0); }
+          25% { transform: translateY(-15px) translateX(10px); }
+          50% { transform: translateY(0) translateX(20px); }
+          75% { transform: translateY(15px) translateX(10px); }
+        }
+        .animate-float {
+          animation: float 15s ease-in-out infinite;
+        }
+      `}</style>
     </main>
+  )
+}
+
+function FeatureCard({ title, description, icon }: { title: string; description: string; icon: string }) {
+  return (
+    <div className="bg-gray-800/50 backdrop-blur-sm border border-amber-500/20 rounded-xl p-6 hover:bg-gray-800/70 transition-colors">
+      <div className="text-4xl mb-4">{icon}</div>
+      <h3 className="text-xl font-bold mb-3 text-amber-300">{title}</h3>
+      <p className="text-gray-400">{description}</p>
+    </div>
   )
 }

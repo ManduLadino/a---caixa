@@ -13,9 +13,12 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const pathname = usePathname()
 
+  // Adicione o link para o Gabinete 3D na lista de menuItems
+
   const menuItems = [
     { icon: Home, label: "Início", href: "/" },
     { icon: Compass, label: "Oráculo", href: "/oraculo" },
+    { icon: Compass, label: "Gabinete 3D", href: "/gabinete-3d" },
     { icon: History, label: "Histórico", href: "/historico" },
     { icon: Crown, label: "Assinatura", href: "/assinatura" },
     { icon: User, label: "Perfil", href: "/perfil" },
