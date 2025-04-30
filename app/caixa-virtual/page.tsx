@@ -1,6 +1,6 @@
 "use client"
 
-import RealisticStoneBox from "@/components/realistic-stone-box"
+import SimplifiedCrystalCabinet from "@/components/simplified-crystal-cabinet"
 
 export default function CaixaVirtualPage() {
   return (
@@ -14,12 +14,12 @@ export default function CaixaVirtualPage() {
         </p>
 
         <div className="flex justify-center">
-          <RealisticStoneBox />
+          <SimplifiedCrystalCabinet />
         </div>
 
         <div className="mt-12 text-center text-white/60 text-sm">
-          <p className="mb-2">Arraste as pedras para reorganizá-las conforme sua intuição e energia.</p>
-          <p>Shift+Clique em qualquer pedra para ver seu significado e propriedades.</p>
+          <p className="mb-2">Selecione as pedras para colocá-las na CAIXA conforme sua intuição e energia.</p>
+          <p>Clique em qualquer pedra para ver seu significado e propriedades.</p>
           <p>© 2023 A Caixa Mística - Todos os direitos reservados</p>
         </div>
       </div>
